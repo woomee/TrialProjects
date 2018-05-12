@@ -1,0 +1,41 @@
+plugins {
+    id 'war'
+//    id 'org.akhikhl.gretty' version '1.4.2'
+//    id 'org.akhikhl.gretty'
+}
+
+apply from: 'https://raw.github.com/akhikhl/gretty/master/pluginScripts/gretty.plugin'
+
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    providedCompile 'javax.servlet:javax.servlet-api:3.1.0'
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-core:2.7.19'
+    testCompile 'io.github.bonigarcia:webdrivermanager:1.6.1'
+    testCompile 'org.seleniumhq.selenium:selenium-java:3.3.1'
+}
+
+
+gretty {
+	integrationTestTask = 'test'
+  // supported values:
+  // 'jetty7', 'jetty8', 'jetty9', 'jetty93', 'jetty94', 'tomcat7', 'tomcat8'
+//	  servletContainer = 'jetty9'
+//  servletContainer = 'jetty93'
+  servletContainer = 'tomcat8'
+}
+
+def dependenciesCopyTargetDirName = 'src/main/webapp/WEB-INF/lib'
+
+task copyDependencies(type: Copy) {
+	// 一旦ディレクトリは消す
+	delete dependenciesCopyTargetDirName;
+
+	// 関連のあるJarを全てコピーする
+	from configurations.testRuntime
+ 	into dependenciesCopyTargetDirName
+}

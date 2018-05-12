@@ -1,0 +1,8 @@
+.gradle
+gradle
+gradlew*
+gradle.bat
+build/
+src/main/webapp/META-INF/
+src/main/webapp/WEB-INF/lib/
+src/main/webapp/WEB-INF/classes/
