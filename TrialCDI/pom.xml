@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Tomcatを使ったCDIのサンプル
+
+	Jerseyのcid-exampleをbaseに変更
+
+	・weld-servletのバージョンを2.4.7に変更。
+	   (バージョン指定がないと2.2.14になりエラーとなる)
+	・jersey-weld2-seはTomcatで利用するため不要
+
+ -->
+
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.glassfish.jersey.examples</groupId>
+		<artifactId>webapp-example-parent</artifactId>
+		<relativePath>../webapp-example-parent/pom.xml</relativePath>
+		<version>2.27</version>
+	</parent>
+
+	<artifactId>cdi-webapp</artifactId>
+	<packaging>war</packaging>
+	<name>jersey-examples-cdi-webapp</name>
+
+	<description>Jersey CDI example.</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>javax.ws.rs</groupId>
+			<artifactId>javax.ws.rs-api</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.containers</groupId>
+			<artifactId>jersey-container-servlet</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<!-- Servlet2.x系用のため無くてもよい -->
+			<groupId>org.glassfish.jersey.containers</groupId>
+			<artifactId>jersey-container-servlet-core</artifactId>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.glassfish.hk2.external</groupId>
+			<artifactId>javax.inject</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.core</groupId>
+			<artifactId>jersey-server</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.ext.cdi</groupId>
+			<artifactId>jersey-cdi1x</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.ext.cdi</groupId>
+			<artifactId>jersey-cdi1x-servlet</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.weld.servlet</groupId>
+			<artifactId>weld-servlet</artifactId>
+			<version>2.4.7.Final</version>
+		</dependency>
+
+
+        <dependency>
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.enterprise</groupId>
+            <artifactId>cdi-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+           <groupId>org.glassfish.jersey.containers</groupId>
+           <artifactId>jersey-container-grizzly2-http</artifactId>
+           <scope>provided</scope>
+        </dependency>
+<!--
+        <dependency>
+            <groupId>org.glassfish.jersey.ext.cdi</groupId>
+            <artifactId>jersey-weld2-se</artifactId>
+            <scope>provided</scope>
+        </dependency>
+-->
+
+
+	</dependencies>
+
+
+</project>

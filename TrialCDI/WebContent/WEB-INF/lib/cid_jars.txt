@@ -1,0 +1,67 @@
+ ドライブ C のボリューム ラベルは OS です
+ ボリューム シリアル番号は 9A44-D219 です
+
+ TrialCDI\WebContent\WEB-INF\lib のディレクトリ
+
+2018/05/24  22:52    <DIR>          .
+2018/05/24  22:52    <DIR>          ..
+2018/05/08  00:46            14,768 aopalliance-repackaged-2.5.0-b42.jar
+2018/05/08  00:46            70,701 cdi-api-1.1.jar
+2018/05/24  22:52                 0 cid_jars.txt
+2018/05/08  00:46            33,936 el-api-2.2.jar
+2018/05/08  00:46           855,244 grizzly-framework-2.4.0.jar
+2018/05/08  00:46           352,213 grizzly-http-2.4.0.jar
+2018/05/08  00:46           314,003 grizzly-http-server-2.4.0.jar
+2018/05/08  00:46           221,266 grizzly-http-servlet-2.4.0.jar
+2018/05/08  00:46            45,024 hamcrest-core-1.3.jar
+2018/05/08  00:46           186,763 hk2-api-2.5.0-b42.jar
+2018/05/08  00:46           189,454 hk2-locator-2.5.0-b42.jar
+2018/05/08  00:46           135,317 hk2-utils-2.5.0-b42.jar
+2018/05/08  00:46           737,884 javassist-3.22.0-CR2.jar
+2018/05/08  00:46            26,366 javax.annotation-api-1.2.jar
+2018/05/08  00:46             2,497 javax.inject-1.jar
+2018/05/08  00:46             5,951 javax.inject-2.5.0-b42.jar
+2018/05/08  00:46           102,537 javax.servlet-api-4.0.0.jar
+2018/05/08  00:46           127,509 javax.ws.rs-api-2.1.jar
+2018/05/08  00:46             5,617 jboss-interceptors-api_1.1_spec-1.0.0.Beta1.jar
+2018/05/08  00:46            50,292 jersey-cdi1x-2.27.jar
+2018/05/08  00:46            14,423 jersey-cdi1x-servlet-2.27.jar
+2018/05/08  00:46           181,563 jersey-client-2.27.jar
+2018/05/08  00:46         1,140,395 jersey-common-2.27.jar
+2018/05/08  00:46            27,149 jersey-container-grizzly2-http-2.27.jar
+2018/05/08  00:46             6,996 jersey-container-grizzly2-servlet-2.27.jar
+2018/05/08  00:46            21,160 jersey-container-jdk-http-2.27.jar
+2018/05/08  00:46            26,284 jersey-container-jetty-http-2.27.jar
+2018/05/08  00:46            40,023 jersey-container-netty-http-2.27.jar
+2018/05/08  00:46            18,085 jersey-container-servlet-2.27.jar
+2018/05/08  00:46            59,332 jersey-container-servlet-core-2.27.jar
+2018/05/08  00:46            34,142 jersey-container-simple-http-2.27.jar
+2018/05/08  00:46            62,547 jersey-hk2-2.27.jar
+2018/05/08  00:46            71,936 jersey-media-jaxb-2.27.jar
+2018/05/08  00:46            31,156 jersey-netty-connector-2.27.jar
+2018/05/08  00:46           933,619 jersey-server-2.27.jar
+2018/05/08  00:46            29,878 jersey-test-framework-core-2.27.jar
+2018/05/08  00:46             4,419 jersey-test-framework-provider-bundle-2.27.pom
+2018/05/08  00:46             6,452 jersey-test-framework-provider-external-2.27.jar
+2018/05/08  00:46            12,222 jersey-test-framework-provider-grizzly2-2.27.jar
+2018/05/08  00:46            14,670 jersey-test-framework-provider-inmemory-2.27.jar
+2018/05/08  00:46             7,103 jersey-test-framework-provider-jdk-http-2.27.jar
+2018/05/08  00:46             7,409 jersey-test-framework-provider-jetty-2.27.jar
+2018/05/08  00:46             5,734 jersey-test-framework-provider-netty-2.27.jar
+2018/05/08  00:46             7,143 jersey-test-framework-provider-simple-2.27.jar
+2018/05/08  00:46            16,681 jetty-continuation-9.4.7.v20170914.jar
+2018/05/08  00:46           164,564 jetty-http-9.4.7.v20170914.jar
+2018/05/08  00:46           129,763 jetty-io-9.4.7.v20170914.jar
+2018/05/08  00:46           580,721 jetty-server-9.4.7.v20170914.jar
+2018/05/08  00:46           464,144 jetty-util-9.4.7.v20170914.jar
+2018/05/08  00:46             5,848 jsr250-api-1.0.jar
+2018/05/08  00:46           314,932 junit-4.12.jar
+2018/05/08  00:46         3,500,908 netty-all-4.1.5.Final.jar
+2018/05/08  00:46            20,235 osgi-resource-locator-1.0.1.jar
+2018/05/08  00:46            44,252 simple-common-6.0.1.jar
+2018/05/08  00:46           176,242 simple-http-6.0.1.jar
+2018/05/08  00:46            70,470 simple-transport-6.0.1.jar
+2018/05/08  00:46            63,777 validation-api-1.1.0.Final.jar
+2018/05/08  00:46         3,043,289 weld-servlet-2.4.7.Final.jar
+              58 個のファイル          14,837,008 バイト
+               2 個のディレクトリ  846,708,101,120 バイトの空き領域
