@@ -1,11 +1,7 @@
 plugins {
     id 'war'
-//    id 'org.akhikhl.gretty' version '1.4.2'
-//    id 'org.akhikhl.gretty'
+    id 'org.akhikhl.gretty' version '1.4.2'
 }
-
-apply from: 'https://raw.github.com/akhikhl/gretty/master/pluginScripts/gretty.plugin'
-
 
 repositories {
     jcenter()
@@ -26,7 +22,8 @@ gretty {
   // 'jetty7', 'jetty8', 'jetty9', 'jetty93', 'jetty94', 'tomcat7', 'tomcat8'
 //	  servletContainer = 'jetty9'
 //  servletContainer = 'jetty93'
-  servletContainer = 'tomcat8'
+// Tomcatはうまく動かない
+//  servletContainer = 'tomcat8'
 }
 
 def dependenciesCopyTargetDirName = 'src/main/webapp/WEB-INF/lib'
