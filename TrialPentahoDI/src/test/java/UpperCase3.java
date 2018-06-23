@@ -58,8 +58,8 @@ public class UpperCase3 extends TransformClassBase {
 	    }
 
 		/* 行データを取得。最後の行はnullとなるので終了処理 */
-	    Object[] row = getRow();
-	    if (row == null) {
+	    Object[] inputRow = getRow();
+	    if (inputRow == null) {
 	    	// 標準出力ではPDIで表示されない
 	    	//System.out.println("r == null");
 	    	logBasic("r==null");
@@ -68,11 +68,11 @@ public class UpperCase3 extends TransformClassBase {
 	    }
 
 	    /* 出力するサイズの行オブジェクトを生成 */
-	    row = createOutputRow(row, data.outputRowMeta.size());
+	    Object[] outputRow = createOutputRow(inputRow, data.outputRowMeta.size());
 
 	    /* 前のステップからの入力フィールド"col1"を得る */
 	    FieldHelper field1 =  get(Fields.In, "col1");
-	    String test_value = field1.getString(row);
+	    String test_value = field1.getString(inputRow);
 
 	    /* [変換]
 	     * 大文字にする
@@ -86,14 +86,14 @@ public class UpperCase3 extends TransformClassBase {
 	     *  "uppercase"列、"lowercase"列はktr側で作成しておく必要あり
 	     */
 	    FieldHelper outField1 = get(Fields.Out, "uppercase");
-	    outField1.setValue(row, uppercase_value);
+	    outField1.setValue(outputRow, uppercase_value);
 
-	    get(Fields.Out, "lowercase").setValue(row, lowercase_value);  // 1ライン化
+	    get(Fields.Out, "lowercase").setValue(outputRow, lowercase_value);  // 1ライン化
 
 	    /*
 	     * 全ての列を出力
 	     */
-	    putRow(data.outputRowMeta, row);
+	    putRow(data.outputRowMeta, outputRow);
 	    logBasic("putRow");
 
 	    return true;
