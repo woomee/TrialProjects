@@ -31,12 +31,15 @@ import org.pentaho.di.core.row.value.*;
 ## Carte
 - Carteの起動・停止
  - 起動 (ポート番号 9080)
-  `carte localhost 9080`
+  `> carte localhost 9080`
  - 停止
- `carte localhost 9080 -s -u cluster -p cluster`
+ `> carte localhost 9080 -s -u cluster -p cluster`
 
 ## Derby
 - DerbyによるJDBCの接続
  - url: jdbc:derby://localhost/testDB;create=true
  - driver: org.apache.derby.jdbc.ClientDriver
-
+-ij.batがSQL実行のコマンドインタフェース
+ - 接続: `> connect 'jdbc:derby://localhost/testDB;create=true';`
+- PDIに入っているDerbyのJDBCドライバはderby-10.2で古いため文字列変換でエラーとなってしまう。
+ - ⇒derby-10.14に変更すると解決
