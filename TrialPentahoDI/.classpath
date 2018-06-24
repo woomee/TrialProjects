@@ -5,5 +5,7 @@
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="lib" path="lib/kettle-core-7.1.0.0-12.jar" sourcepath="lib/pentaho-kettle-7.1.0.13_src.zip"/>
 	<classpathentry kind="lib" path="lib/kettle-engine-7.1.0.0-12.jar" sourcepath="lib/pentaho-kettle-7.1.0.13_src.zip"/>
+	<classpathentry kind="lib" path="lib/derby-10.14.jar"/>
+	<classpathentry kind="lib" path="lib/derbyclient-10.14.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
