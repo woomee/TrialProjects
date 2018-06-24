@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>ConvertCSVLoop03</name>
+    <name>ConvertCSVLoop04</name>
     <description />
     <extended_description />
     <trans_version />
@@ -15,8 +15,8 @@
         <description />
       </parameter>
       <parameter>
-        <name>DB_PASS</name>
-        <default_value>admin</default_value>
+        <name>DB_PASSWORDS</name>
+        <default_value>admin,admin</default_value>
         <description />
       </parameter>
       <parameter>
@@ -30,8 +30,8 @@
         <description />
       </parameter>
       <parameter>
-        <name>DB_USER</name>
-        <default_value>admin</default_value>
+        <name>DB_USERS</name>
+        <default_value>admin,admin</default_value>
         <description />
       </parameter>
       <parameter>
@@ -471,11 +471,16 @@
   </info>
   <notepads>
     <notepad>
-      <note>テーブル名をtable_nameフィールドに入れる</note>
-      <xloc>608</xloc>
-      <yloc>128</yloc>
-      <width>210</width>
-      <heigth>26</heigth>
+      <note>【Extract】
+・テーブル名をdb_tableフィールドに入れる。
+・Extractでdb_user変数を設定しているため、Dummyを挟まないとtable_ouputで利用できない
+
+【Table output】
+・db_tableフィールドにあるテーブル名に対してinsertを行う。</note>
+      <xloc>320</xloc>
+      <yloc>48</yloc>
+      <width>459</width>
+      <heigth>105</heigth>
       <fontname>Yu Gothic UI</fontname>
       <fontsize>9</fontsize>
       <fontbold>N</fontbold>
@@ -499,8 +504,8 @@
     <access>Native</access>
     <database>testDB</database>
     <port>1527</port>
-    <username>${DB_USER}</username>
-    <password>${DB_PASS}</password>
+    <username>${db_user}</username>
+    <password>Encrypted 2be98afc86aa7f2e4cb79ce71da9fa6d4</password>
     <servername />
     <data_tablespace />
     <index_tablespace />
@@ -553,21 +558,26 @@
   </connection>
   <order>
     <hop>
-      <from>convert_to_csv</from>
-      <to>テーブル出力</to>
+      <from>Table loop</from>
+      <to>Extract</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>table_loop</from>
-      <to>convert_to_csv</to>
+      <from>Dummy for setVariable</from>
+      <to>Table output</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Extract</from>
+      <to>Dummy for setVariable</to>
       <enabled>Y</enabled>
     </hop>
   </order>
   <step>
-    <name>convert_to_csv</name>
+    <name>Extract</name>
     <type>UserDefinedJavaClass</type>
     <description />
-    <distribute>N</distribute>
+    <distribute>Y</distribute>
     <custom_distribution />
     <copies>1</copies>
     <partitioning>
@@ -587,10 +597,16 @@ import org.pentaho.di.core.row.value.*;
 	static private String PARAM_IN_FILE = "IN_FILE";
 	static private String PARAM_START_ROW = "START_ROW";
 
+	/* 前のステップから渡されたフィールド */
+	static private String FIELD_DB_TABLE = "db_table";
+	static private String FIELD_DB_USER = "db_user";
+	static private String FIELD_DB_PASS = "db_pass";
+
+
 	/**
 	 * 変換を実行する内部クラス
 	 */
-	private class Converter {
+	private class Extractor {
 
 		private BufferedReader _reader = null;
 
@@ -678,7 +694,7 @@ import org.pentaho.di.core.row.value.*;
 		}
 	}
 
-	Converter converter = new Converter();
+	Extractor extractor = new Extractor();
 
 	String _tableName = "";
 	static int PROCESS_COUNT = 2;
@@ -705,11 +721,21 @@ import org.pentaho.di.core.row.value.*;
 				setOutputDone();
 				return false;
 			}
-			_tableName = get(Fields.In, "db_table").getString(getRowFromPrivStep);
-			logBasic("tableName=" + _tableName);
+			_tableName = get(Fields.In, FIELD_DB_TABLE).getString(getRowFromPrivStep);
+			logBasic("db_table=" + _tableName);
+
+			String db_user = get(Fields.In, FIELD_DB_USER).getString(getRowFromPrivStep);
+			setVariable(FIELD_DB_USER, db_user);
+			logBasic("db_user=" + db_user);
+
+			String db_pass = get(Fields.In, FIELD_DB_PASS).getString(getRowFromPrivStep);
+			setVariable(FIELD_DB_PASS, db_pass);
+			logBasic("db_pass=" + db_pass);
+
+
 
 			/* コンバータの初期化 */
-			converter.init();
+			extractor.init();
 		}
 		_process_contiue = false;
 
@@ -720,7 +746,7 @@ import org.pentaho.di.core.row.value.*;
 		 */
 		Object[] rowData = null;
 		int count = 0;
-		while ((rowData = converter.getRowData()) != null) {
+		while ((rowData = extractor.getRowData()) != null) {
 			/* データの先頭にテーブル名を入れる */
 			Object[] rowDataWithTable = new Object[rowData.length + 1];
 			System.arraycopy(new String[] { _tableName }, 0, rowDataWithTable, 0, 1);
@@ -732,8 +758,8 @@ import org.pentaho.di.core.row.value.*;
 			 * 1列目はテーブル名を入れる
 			 * */
 			RowMetaInterface newFields = new RowMeta();
-			newFields.addValueMeta(new ValueMetaString("table_name"));
-			ValueMetaInterface[] columns = converter.getRowColumns();
+			newFields.addValueMeta(new ValueMetaString(FIELD_DB_TABLE));
+			ValueMetaInterface[] columns = extractor.getRowColumns();
 			for (int i = 0; i &lt; columns.length; i++) {
 				newFields.addValueMeta(columns[i]);
 			}
@@ -755,14 +781,14 @@ import org.pentaho.di.core.row.value.*;
 
 		/* processが終了した時(_process_contiue==true)のみ
 		 *  コンバータのクローズ */
-
 		if (!_process_contiue) {
-			converter.close();
+			extractor.close();
 		}
 
 		return true;
 
-	}</class_source>
+	}
+</class_source>
       </definition>
     </definitions>
     <fields>
@@ -779,13 +805,13 @@ import org.pentaho.di.core.row.value.*;
       </output>
     </remotesteps>
     <GUI>
-      <xloc>432</xloc>
+      <xloc>464</xloc>
       <yloc>192</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>table_loop</name>
+    <name>Table loop</name>
     <type>UserDefinedJavaClass</type>
     <description />
     <distribute>Y</distribute>
@@ -799,11 +825,30 @@ import org.pentaho.di.core.row.value.*;
       <definition>
         <class_type>TRANSFORM_CLASS</class_type>
         <class_name>Processor</class_name>
-        <class_source>	static private String PARAM_DB_TABLES = "DB_TABLES";
+        <class_source>	/* ktrのパラメータとして受け取る */
+	static private String PARAM_DB_TABLES = "DB_TABLES";
+	static private String PARAM_DB_USERS = "DB_USERS";
+	static private String PARAM_DB_PASSWORDS = "DB_PASSWORDS";
 
+	/* 次のステップへフィールドとして渡す */
 	static private String FIELD_DB_TABLE = "db_table";
+	static private String FIELD_DB_USER = "db_user";
+	static private String FIELD_DB_PASS = "db_pass";
 
-	private String[] _db_table_array;
+
+	/* PARAMとFIELDをまとめたもの。個数と順序で対応していることが前提 */
+	static private String[] PARAMS = {
+			PARAM_DB_TABLES,
+			PARAM_DB_USERS,
+			PARAM_DB_PASSWORDS
+	};
+	static private String[] FIELDS = {
+			FIELD_DB_TABLE,
+			FIELD_DB_USER,
+			FIELD_DB_PASS
+	};
+
+	private String[][] _allParams = null;
 	private int _currentIdx = 0;
 
 	/**
@@ -814,26 +859,27 @@ import org.pentaho.di.core.row.value.*;
 		/* 最初の1回目(1行目)はfirst == trueとなる */
 		if (first) {
 			first = false;
-			logBasic("first");
+			logDebug("first");
 
-			String db_tables = getVariable(PARAM_DB_TABLES);
-			_db_table_array = db_tables.split(",");
-			logBasic("db_tables=" + db_tables);
+			/* パラメータをカンマ区切りして取得 */
+			_allParams = getAllParams(PARAMS);
+		}
+
+		/* カレントのデータを取得してouputDataに設定 */
+		String currentParams[] = getParams(_allParams, _currentIdx);
+		Object[] outputField = RowDataUtil.allocateRowData(FIELDS.length);
+		for (int i = 0; i &lt; FIELDS.length; i++) {
+			logDebug("Set Field: " + FIELDS[i] + "=" + currentParams[i]);
+			get(Fields.Out, FIELDS[i]).setValue(outputField, currentParams[i]);
 		}
 
 		/* 次のステップへフィールドで渡す */
-		String db_table = _db_table_array[_currentIdx];
-		Object[] outputData = RowDataUtil.allocateRowData(1);
-		get(Fields.Out, FIELD_DB_TABLE).setValue(outputData, db_table);
-		logBasic("current db_table=" + db_table);
+		putRow(data.outputRowMeta, outputField);
 
+		/* 全てのdb_table(_paramVariables[0])を渡したら終了する */
 		_currentIdx++;
-
-		putRow(data.outputRowMeta, outputData);
-
-
-		if (_currentIdx >= _db_table_array.length) {
-			logBasic("Finish");
+		if (_currentIdx >= _allParams[0].length) {
+			logDebug("Finish");
 			setOutputDone();
 			return false;
 		}
@@ -841,12 +887,48 @@ import org.pentaho.di.core.row.value.*;
 		return true;
 	}
 
-</class_source>
+	private String[][] getAllParams(String[] paramKeys) {
+		String[][] variables = new String[paramKeys.length][];
+		for (int i = 0; i &lt; paramKeys.length; i++) {
+			String[] vals = getVariable(paramKeys[i]).split(",");
+			variables[i] = vals;
+		}
+
+		for (int i = 0; i &lt; variables.length; i++) {
+			for (int j = 0; j &lt; variables[i].length; j++) {
+				logDebug("AllVariables[" + i + "][" + j + "]: " + variables[i][j]);
+			}
+		}
+
+
+		return variables;
+	}
+
+	private String[] getParams(String[][] allParams, int index) {
+		String[] variables = new String[allParams.length];
+		for (int i = 0; i &lt; variables.length; i++) {
+			variables[i] = allParams[i][index];
+			logDebug("CurrentVariable[" + i + "]: " + variables[i]);
+		}
+		return variables;
+	}</class_source>
       </definition>
     </definitions>
     <fields>
       <field>
         <field_name>db_table</field_name>
+        <field_type>String</field_type>
+        <field_length>-1</field_length>
+        <field_precision>-1</field_precision>
+      </field>
+      <field>
+        <field_name>db_user</field_name>
+        <field_type>String</field_type>
+        <field_length>-1</field_length>
+        <field_precision>-1</field_precision>
+      </field>
+      <field>
+        <field_name>db_pass</field_name>
         <field_type>String</field_type>
         <field_length>-1</field_length>
         <field_precision>-1</field_precision>
@@ -864,13 +946,13 @@ import org.pentaho.di.core.row.value.*;
       </output>
     </remotesteps>
     <GUI>
-      <xloc>272</xloc>
+      <xloc>256</xloc>
       <yloc>192</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>テーブル出力</name>
+    <name>Table output</name>
     <type>TableOutput</type>
     <description />
     <distribute>Y</distribute>
@@ -885,7 +967,7 @@ import org.pentaho.di.core.row.value.*;
     <table />
     <commit>1000</commit>
     <truncate>N</truncate>
-    <ignore_errors>N</ignore_errors>
+    <ignore_errors>Y</ignore_errors>
     <use_batch>N</use_batch>
     <specify_fields>N</specify_fields>
     <partitioning_enabled>N</partitioning_enabled>
@@ -893,7 +975,7 @@ import org.pentaho.di.core.row.value.*;
     <partitioning_daily>N</partitioning_daily>
     <partitioning_monthly>Y</partitioning_monthly>
     <tablename_in_field>Y</tablename_in_field>
-    <tablename_field>table_name</tablename_field>
+    <tablename_field>db_table</tablename_field>
     <tablename_in_table>N</tablename_in_table>
     <return_keys>N</return_keys>
     <return_field />
@@ -907,7 +989,31 @@ import org.pentaho.di.core.row.value.*;
       </output>
     </remotesteps>
     <GUI>
-      <xloc>688</xloc>
+      <xloc>784</xloc>
+      <yloc>192</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Dummy for setVariable</name>
+    <type>Dummy</type>
+    <description />
+    <distribute>Y</distribute>
+    <custom_distribution />
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name />
+    </partitioning>
+    <cluster_schema />
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>656</xloc>
       <yloc>192</yloc>
       <draw>Y</draw>
     </GUI>
