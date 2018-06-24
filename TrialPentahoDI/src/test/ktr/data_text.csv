@@ -1,11 +1,11 @@
-col1,uppercase
-Hello,HELLO
-Apple,APPLE
-This,THIS
-is,IS
-a ,A 
-pen,PEN
-Car,CAR
-Diamond,DIAMOND
-English,ENGLISH
-Finish,FINISH
+ID,col1
+1,Hello
+2,Apple
+3,This
+4,is
+5,a 
+6,pen
+7,Car
+8,Diamond
+9,English
+10,Finish

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>UpperCase3</name>
+    <name>ConvertCSV2</name>
     <description />
     <extended_description />
     <trans_version />
@@ -10,8 +10,13 @@
     <directory>/</directory>
     <parameters>
       <parameter>
-        <name>param1</name>
-        <default_value>param1</default_value>
+        <name>IN_FILE</name>
+        <default_value>C:/data/home/eiichi/Workspaces/space2/TrialPentahoDI/src/test/ktr/data_text.csv</default_value>
+        <description />
+      </parameter>
+      <parameter>
+        <name>START_ROW</name>
+        <default_value>1</default_value>
         <description />
       </parameter>
     </parameters>
@@ -441,249 +446,77 @@
   </info>
   <notepads>
   </notepads>
+  <connection>
+    <name>Derby_local_testDB</name>
+    <server>localhost</server>
+    <type>GENERIC</type>
+    <access>Native</access>
+    <database>testDB</database>
+    <port>1527</port>
+    <username>admin</username>
+    <password>Encrypted 2be98afc86aa7f2e4cb79ce71da9fa6d4</password>
+    <servername />
+    <data_tablespace />
+    <index_tablespace />
+    <attributes>
+      <attribute>
+        <code>CUSTOM_DRIVER_CLASS</code>
+        <attribute>org.apache.derby.jdbc.ClientDriver</attribute>
+      </attribute>
+      <attribute>
+        <code>CUSTOM_URL</code>
+        <attribute>jdbc:derby://localhost/testDB;create=true</attribute>
+      </attribute>
+      <attribute>
+        <code>FORCE_IDENTIFIERS_TO_LOWERCASE</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>FORCE_IDENTIFIERS_TO_UPPERCASE</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>IS_CLUSTERED</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>PORT_NUMBER</code>
+        <attribute>1527</attribute>
+      </attribute>
+      <attribute>
+        <code>PRESERVE_RESERVED_WORD_CASE</code>
+        <attribute>Y</attribute>
+      </attribute>
+      <attribute>
+        <code>QUOTE_ALL_FIELDS</code>
+        <attribute>N</attribute>
+      </attribute>
+      <attribute>
+        <code>SUPPORTS_BOOLEAN_DATA_TYPE</code>
+        <attribute>Y</attribute>
+      </attribute>
+      <attribute>
+        <code>SUPPORTS_TIMESTAMP_DATA_TYPE</code>
+        <attribute>Y</attribute>
+      </attribute>
+      <attribute>
+        <code>USE_POOLING</code>
+        <attribute>N</attribute>
+      </attribute>
+    </attributes>
+  </connection>
   <order>
     <hop>
-      <from>Generate Rows</from>
-      <to>transform</to>
-      <enabled>N</enabled>
-    </hop>
-    <hop>
-      <from>Microsoft Excel Input</from>
-      <to>transform</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>transform</from>
-      <to>Text file output</to>
+      <from>convert_to_csv</from>
+      <to>テーブル出力</to>
       <enabled>Y</enabled>
     </hop>
   </order>
   <step>
-    <name>Generate Rows</name>
-    <type>RowGenerator</type>
-    <description />
-    <distribute>Y</distribute>
-    <custom_distribution />
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name />
-    </partitioning>
-    <fields>
-      <field>
-        <name>testfield</name>
-        <type>String</type>
-        <format />
-        <currency />
-        <decimal />
-        <group />
-        <nullif>test value</nullif>
-        <length>-1</length>
-        <precision>-1</precision>
-        <set_empty_string>N</set_empty_string>
-      </field>
-    </fields>
-    <limit>10</limit>
-    <never_ending>N</never_ending>
-    <interval_in_ms />
-    <row_time_field />
-    <last_time_field />
-    <cluster_schema />
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>91</xloc>
-      <yloc>95</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Microsoft Excel Input</name>
-    <type>ExcelInput</type>
-    <description />
-    <distribute>Y</distribute>
-    <custom_distribution />
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name />
-    </partitioning>
-    <header>Y</header>
-    <noempty>Y</noempty>
-    <stoponempty>N</stoponempty>
-    <filefield />
-    <sheetfield />
-    <sheetrownumfield />
-    <rownumfield />
-    <sheetfield />
-    <filefield />
-    <limit>0</limit>
-    <encoding />
-    <add_to_result_filenames>Y</add_to_result_filenames>
-    <accept_filenames>N</accept_filenames>
-    <accept_field />
-    <accept_stepname />
-    <file>
-      <name>${Internal.Entry.Current.Directory}\data_text.xls</name>
-      <filemask />
-      <exclude_filemask />
-      <file_required>N</file_required>
-      <include_subfolders>N</include_subfolders>
-    </file>
-    <fields>
-      <field>
-        <name>ID</name>
-        <type>Number</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-        <repeat>N</repeat>
-        <format />
-        <currency />
-        <decimal />
-        <group />
-      </field>
-      <field>
-        <name>col1</name>
-        <type>String</type>
-        <length>-1</length>
-        <precision>-1</precision>
-        <trim_type>none</trim_type>
-        <repeat>N</repeat>
-        <format />
-        <currency />
-        <decimal />
-        <group />
-      </field>
-    </fields>
-    <sheets>
-      <sheet>
-        <name>Sheet1</name>
-        <startrow>0</startrow>
-        <startcol>0</startcol>
-      </sheet>
-    </sheets>
-    <strict_types>N</strict_types>
-    <error_ignored>N</error_ignored>
-    <error_line_skipped>N</error_line_skipped>
-    <bad_line_files_destination_directory />
-    <bad_line_files_extension>warning</bad_line_files_extension>
-    <error_line_files_destination_directory />
-    <error_line_files_extension>error</error_line_files_extension>
-    <line_number_files_destination_directory />
-    <line_number_files_extension>line</line_number_files_extension>
-    <shortFileFieldName />
-    <pathFieldName />
-    <hiddenFieldName />
-    <lastModificationTimeFieldName />
-    <uriNameFieldName />
-    <rootUriNameFieldName />
-    <extensionFieldName />
-    <sizeFieldName />
-    <spreadsheet_type>JXL</spreadsheet_type>
-    <cluster_schema />
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>96</xloc>
-      <yloc>192</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>Text file output</name>
-    <type>TextFileOutput</type>
-    <description />
-    <distribute>Y</distribute>
-    <custom_distribution />
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name />
-    </partitioning>
-    <separator>,</separator>
-    <enclosure>"</enclosure>
-    <enclosure_forced>N</enclosure_forced>
-    <enclosure_fix_disabled>N</enclosure_fix_disabled>
-    <header>Y</header>
-    <footer>N</footer>
-    <format>DOS</format>
-    <compression>None</compression>
-    <encoding>windows-31j</encoding>
-    <endedLine />
-    <fileNameInField>N</fileNameInField>
-    <fileNameField />
-    <create_parent_folder>Y</create_parent_folder>
-    <file>
-      <name>${Internal.Entry.Current.Directory}\data_text</name>
-      <is_command>N</is_command>
-      <servlet_output>N</servlet_output>
-      <do_not_open_new_file_init>N</do_not_open_new_file_init>
-      <extention>csv</extention>
-      <append>N</append>
-      <split>N</split>
-      <haspartno>N</haspartno>
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <SpecifyFormat>N</SpecifyFormat>
-      <date_time_format />
-      <add_to_result_filenames>Y</add_to_result_filenames>
-      <pad>N</pad>
-      <fast_dump>N</fast_dump>
-      <splitevery>0</splitevery>
-    </file>
-    <fields>
-      <field>
-        <name>col1</name>
-        <type>String</type>
-        <format />
-        <currency />
-        <decimal />
-        <group />
-        <nullif />
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-      <field>
-        <name>uppercase</name>
-        <type>String</type>
-        <format />
-        <currency />
-        <decimal />
-        <group />
-        <nullif />
-        <trim_type>none</trim_type>
-        <length>-1</length>
-        <precision>-1</precision>
-      </field>
-    </fields>
-    <cluster_schema />
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>400</xloc>
-      <yloc>96</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>transform</name>
+    <name>convert_to_csv</name>
     <type>UserDefinedJavaClass</type>
     <description />
-    <distribute>Y</distribute>
+    <distribute>N</distribute>
     <custom_distribution />
     <copies>1</copies>
     <partitioning>
@@ -694,80 +527,148 @@
       <definition>
         <class_type>TRANSFORM_CLASS</class_type>
         <class_name>Processor</class_name>
-        <class_source>	public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws KettleException
-	{
+        <class_source>import java.io.*;
+import java.nio.file.*;
+import java.util.*;
+
+	/**
+	 * 変換を実行する内部クラス
+	 */
+	private class Converter {
+		/* ktr側で設定されているパラメータ */
+		// TODO: 外部jarにする際にstatic化
+		private String PARAM_IN_FILE= "IN_FILE";
+		private String PARAM_START_ROW = "START_ROW";
+
+		private BufferedReader _reader = null;
+
+		/**
+		 * ファイルを読み込み初期化
+		 * @throws KettleException
+		 */
+		public void init() throws KettleException{
+			try {
+				/* パラメータで指定されたファイルを読み込む */
+				String filePathStr = getVariable(PARAM_IN_FILE);
+				logBasic("In FilePath=" + filePathStr);
+				Path filePath = Paths.get(filePathStr, new String[0]);
+				_reader = Files.newBufferedReader(filePath);
+
+				/* パラメータで指定された最初の行まで読み込む */
+				int startRow = Integer.parseInt(getVariable(PARAM_START_ROW));
+				for(int i = 0; i &lt; startRow; i++) {
+					_reader.readLine();
+				}
+			} catch (IOException e) {
+				throwAsKettleException(e);
+			}
+		}
+
+		/**
+		 * ファイルを1行読み込んで配列を返す
+		 *
+		 * @return 読み込んだデータ。終端の場合はnul値とする。
+		 */
+		public Object[] getRow() throws KettleException {
+			if (_reader == null) {
+				return null;
+			}
+			String line = null;
+			try {
+				line = _reader.readLine();
+			} catch (IOException e) {
+				throwAsKettleException(e);
+			}
+			if (line == null) {
+				return null;
+			}
+
+			String[] columnDatas = line.split(",");
+
+			/*
+			 * 必要に応じて変換処理
+			 */
+			// 大文字にする
+			columnDatas[1] = toUpper(columnDatas[1]);
+
+
+			return columnDatas;
+		}
+
+		public String toUpper(String indata) {
+			return indata.toUpperCase();
+		}
+
+		public void close() throws KettleException {
+			if (_reader != null) {
+				try {
+					_reader.close();
+				} catch (IOException e) {
+					throwAsKettleException(e);
+				}
+			}
+		}
+
+		private void throwAsKettleException(Throwable e) throws KettleException {
+			logError("エラーが発生", e);
+			throw new KettleException(e);
+		}
+	}
+
+	Converter converter = new Converter();
+
+	/**
+	 * @return 次の行へ継続する場合はtrue, 終了する場合はfalse
+	 */
+	public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws KettleException {
+
 		/* 最初の1回目(1行目)はfirst == trueとなる */
-		if (first){
-	        first = false;
-	        logBasic("first");
+		if (first) {
+			first = false;
+			logBasic("first");
 
-	        /*
-	         * パラメータはgetVariable()で取得する。
-	         * getParameter()は「ユーザ定義Java」のみで設定されたものとなる。
-	         */
-	        String param1 = getParameter("param1");
-	        logBasic("getParameter(): param1 = " + param1);		// null
-	        param1 = getVariable("param1", "defaultValue");
-	        logBasic("getVariable(): param1 = " + param1);		// defaultValue or 設定されたパラメータ
+			/* ファイルの読み込みと初期化 */
+			converter.init();
 
-	    }
+			/* 出力する列データcol1を設定 */
+			RowMetaInterface newFields = new RowMeta();
+			//ValueMetaInterface newFieldMeta = new ValueMetaDate("col1", ValueMetaInterface.TYPE_STRING);
+			ValueMetaInterface newFieldMeta = new ValueMeta("col1", ValueMeta.TYPE_STRING);
+			newFields.addValueMeta(newFieldMeta);
+			newFields.addValueMeta(new ValueMeta("col2", ValueMetaInterface.TYPE_STRING));
+			data.outputRowMeta.addRowMeta(newFields);
+		}
 
 		/* 行データを取得。最後の行はnullとなるので終了処理 */
-	    Object[] inputRow = getRow();
-	    if (inputRow == null) {
-	    	// 標準出力ではPDIで表示されない
-	    	//System.out.println("r == null");
-	    	logBasic("r==null");
-	    	setOutputDone();
-	        return false;
-	    }
+		Object[] inputRow = converter.getRow();
+		if (inputRow == null) {
+			logBasic("inputRow==null");
+			setOutputDone();
+			converter.close();
+			return false;
+		}
 
-	    /* 出力するサイズの行オブジェクトを生成 */
-	    Object[] outputRow = createOutputRow(inputRow, data.outputRowMeta.size());
+//		/* 出力するサイズの行オブジェクトを生成。サイズは入力と同じとする */
+//		Object[] outputRow = createOutputRow(inputRow, inputRow.length);
+//		for (int i = 0; i &lt; outputRow.length; i++) {
+//			String outColName = "col" + (i+1);
+//
+//			FieldHelper outColumnHelper = get(Fields.Out, outColName);
+//			outColumnHelper.setValue(outputRow, inputRow[i]);
+//		}
 
-	    /* 前のステップからの入力フィールド"col1"を得る */
-	    FieldHelper field1 =  get(Fields.In, "col1");
-	    String test_value = field1.getString(inputRow);
+		/*
+		 * 全ての列をそのまま出力
+		 */
+		putRow(data.outputRowMeta, inputRow);
+		logBasic("putRow");
 
-	    /* [変換]
-	     * 大文字/小文字にする
-	     */
-	    String uppercase_value = test_value.toUpperCase();
-	    String lowercase_value = test_value.toLowerCase();
-
-	    /*
-	     * 変換したデータを"uppercase"列, "lowercase"列として出力へセット
-	     *
-	     *  "uppercase"列、"lowercase"列はktr側で作成しておく必要あり
-	     */
-	    FieldHelper outField1 = get(Fields.Out, "uppercase");
-	    outField1.setValue(outputRow, uppercase_value);
-
-	    get(Fields.Out, "lowercase").setValue(outputRow, lowercase_value);  // 1ライン化
-
-	    /*
-	     * 全ての列を出力
-	     */
-	    putRow(data.outputRowMeta, outputRow);
-	    logBasic("putRow");
-
-	    return true;
-	}</class_source>
+		return true;
+	}
+</class_source>
       </definition>
     </definitions>
     <fields>
-      <field>
-        <field_name>uppercase</field_name>
-        <field_type>String</field_type>
-        <field_length>-1</field_length>
-        <field_precision>-1</field_precision>
-      </field>
-      <field>
-        <field_name>lowercase</field_name>
-        <field_type>String</field_type>
-        <field_length>-1</field_length>
-        <field_precision>-1</field_precision>
-      </field>
     </fields>
     <clear_result_fields>N</clear_result_fields>
     <info_steps />
@@ -781,8 +682,51 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>224</xloc>
-      <yloc>96</yloc>
+      <xloc>160</xloc>
+      <yloc>192</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>テーブル出力</name>
+    <type>TableOutput</type>
+    <description />
+    <distribute>Y</distribute>
+    <custom_distribution />
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name />
+    </partitioning>
+    <connection>Derby_local_testDB</connection>
+    <schema>APP</schema>
+    <table>TB1</table>
+    <commit>1000</commit>
+    <truncate>Y</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>N</use_batch>
+    <specify_fields>N</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field />
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field />
+    <tablename_in_table>N</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field />
+    <fields>
+    </fields>
+    <cluster_schema />
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>688</xloc>
+      <yloc>192</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
