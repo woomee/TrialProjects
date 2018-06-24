@@ -8,6 +8,9 @@ Pentaho Data Integrationを使った開発のトライアル。サンプルは�
 - Pentaho DIのlibクラスから以下をクラスパスに追加
  - kettele-core-xxxx.jar
  - kettel-engine-xxxx.jar
+  - 現状は7.1.12を利用
+  - ソースは以下より取得
+   - https://github.com/pentaho/pentaho-kettle/tree/7.1.0.13
 - 以下のTransformClassBaseを継承してprocessRow()メソッドを実装する
  org.pentaho.di.trans.steps.userdefinedjavaclass.TransformClassBase
 - pentaho以外のimportは追記する必要あり。ただ、pentahoパッケージでも追記する必要があるもの有り。
