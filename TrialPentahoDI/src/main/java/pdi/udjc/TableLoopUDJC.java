@@ -29,14 +29,62 @@ public class TableLoopUDJC extends TransformClassBase {
 	// import文もpentaho以外のものはコピーする。
 
 	/* ktrのパラメータとして受け取る */
-	static public String PARAM_DB_TABLES = "DB_TABLES";
+	static private String PARAM_DB_DRIVERS = "DB_DRIVERS";
+	static private String PARAM_DB_URLS = "DB_URLS";
+	static private String PARAM_DB_SCHEMAS = "DB_SCHEMAS";
+	static private String PARAM_DB_TABLES = "DB_TABLES";
+	static private String PARAM_DB_USERS = "DB_USERS";
+	static private String PARAM_DB_PASSWORDS = "DB_PASSWORDS";
+	static private String PARAM_START_ROWS = "START_ROWS";
 
 	/* 次のステップへフィールドとして渡す */
-	static public String FIELD_DB_TABLE = "db_table";
+	static private String FIELD_DB_DRIVER = "db_driver";
+	static private String FIELD_DB_URL = "db_url";
+	static private String FIELD_DB_SCHEMA = "db_schema";
+	static private String FIELD_DB_TABLE = "db_table";
+	static private String FIELD_DB_USER = "db_user";
+	static private String FIELD_DB_PASS = "db_pass";
+	static private String FIELD_START_ROW = "start_row";
 
 
-	private String[] _db_table_array;
+	/* PARAMとFIELDをまとめたもの。個数と順序で対応していることが前提 */
+	static private String[] PARAMS = {
+			PARAM_DB_DRIVERS,
+			PARAM_DB_URLS,
+			PARAM_DB_SCHEMAS,
+			PARAM_DB_TABLES,
+			PARAM_DB_USERS,
+			PARAM_DB_PASSWORDS,
+			PARAM_START_ROWS
+	};
+	static private String[] FIELDS = {
+			FIELD_DB_DRIVER,
+			FIELD_DB_URL,
+			FIELD_DB_SCHEMA,
+			FIELD_DB_TABLE,
+			FIELD_DB_USER,
+			FIELD_DB_PASS,
+			FIELD_START_ROW
+	};
+
+	private String[][] _allParams = null;
 	private int _currentIdx = 0;
+
+
+
+	// Kettleでエラーとなる
+	// @Override
+	public void dispose(StepMetaInterface smi, StepDataInterface sdi) {
+		super.dispose(smi, sdi);
+		logBasic("TableLoop: dispose()");
+	}
+	public void stopRunning(StepMetaInterface stepMetaInterface, StepDataInterface stepDataInterface)
+			throws KettleException {
+		super.stopRunning(stepMetaInterface, stepDataInterface);
+		logBasic("TableLoop: stopRunning()!");
+	}
+
+
 
 	/**
 	 * @return 次の行へ継続する場合はtrue, 終了する場合はfalse
@@ -46,29 +94,58 @@ public class TableLoopUDJC extends TransformClassBase {
 		/* 最初の1回目(1行目)はfirst == trueとなる */
 		if (first) {
 			first = false;
+			logDebug("first");
 
-			String db_tables = getVariable(PARAM_DB_TABLES);
-			_db_table_array = db_tables.split(",");
-			logBasic("db_tables=" + db_tables);
+			/* パラメータをカンマ区切りして取得 */
+			_allParams = getAllParams(PARAMS);
 		}
 
+		/* カレントのデータを取得してouputDataに設定 */
+		String currentParams[] = getParams(_allParams, _currentIdx);
+		Object[] outputField = RowDataUtil.allocateRowData(FIELDS.length);
+		for (int i = 0; i < FIELDS.length; i++) {
+			logDebug("Set Field: " + FIELDS[i] + "=" + currentParams[i]);
+			get(Fields.Out, FIELDS[i]).setValue(outputField, currentParams[i]);
+		}
 
-		String db_table = _db_table_array[_currentIdx];
-		Object[] outputData = RowDataUtil.allocateRowData(1);
-		get(Fields.Out, FIELD_DB_TABLE).setValue(outputData, db_table);
+		/* 次のステップへフィールドで渡す */
+		putRow(data.outputRowMeta, outputField);
+
+		/* 全てのdb_table(_paramVariables[0])を渡したら終了する */
 		_currentIdx++;
-		logBasic("current db_table=" + db_table);
-
-		putRow(data.outputRowMeta, new Object[] {db_table});
-
-
-		if (_currentIdx >= _db_table_array.length) {
-			logBasic("Finish");
+		if (_currentIdx >= _allParams[0].length) {
+			logDebug("Finish");
 			setOutputDone();
 			return false;
 		}
 
 		return true;
+	}
+
+	private String[][] getAllParams(String[] paramKeys) {
+		String[][] variables = new String[paramKeys.length][];
+		for (int i = 0; i < paramKeys.length; i++) {
+			String[] vals = getVariable(paramKeys[i]).split(",");
+			variables[i] = vals;
+		}
+
+		for (int i = 0; i < variables.length; i++) {
+			for (int j = 0; j < variables[i].length; j++) {
+				logDebug("AllVariables[" + i + "][" + j + "]: " + variables[i][j]);
+			}
+		}
+
+
+		return variables;
+	}
+
+	private String[] getParams(String[][] allParams, int index) {
+		String[] variables = new String[allParams.length];
+		for (int i = 0; i < variables.length; i++) {
+			variables[i] = allParams[i][index];
+			logDebug("CurrentVariable[" + i + "]: " + variables[i]);
+		}
+		return variables;
 	}
 
 	///////////////////////////////////////////////////

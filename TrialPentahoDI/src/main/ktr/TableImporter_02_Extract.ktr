@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>Import</name>
+    <name>TableImporter_02</name>
     <description />
     <extended_description />
     <trans_version />
@@ -9,41 +9,6 @@
     <trans_status>0</trans_status>
     <directory>/</directory>
     <parameters>
-      <parameter>
-        <name>DB_DRIVER</name>
-        <default_value>org.apache.derby.jdbc.ClientDriver</default_value>
-        <description />
-      </parameter>
-      <parameter>
-        <name>DB_PASS</name>
-        <default_value>admin</default_value>
-        <description />
-      </parameter>
-      <parameter>
-        <name>DB_TABLE</name>
-        <default_value>TB1</default_value>
-        <description />
-      </parameter>
-      <parameter>
-        <name>DB_URL</name>
-        <default_value>jdbc:derby://localhost/testDB;create=true</default_value>
-        <description />
-      </parameter>
-      <parameter>
-        <name>DB_USER</name>
-        <default_value>admin</default_value>
-        <description />
-      </parameter>
-      <parameter>
-        <name>IN_FILE</name>
-        <default_value>C:/data/home/eiichi/Workspaces/space2/TrialPentahoDI/src/test/ktr/data_text.csv</default_value>
-        <description />
-      </parameter>
-      <parameter>
-        <name>START_ROW</name>
-        <default_value>1</default_value>
-        <description />
-      </parameter>
     </parameters>
     <log>
       <trans-log-table>
@@ -471,11 +436,66 @@
   </info>
   <notepads>
     <notepad>
-      <note>テーブル名をtable_nameフィールドに入れる</note>
-      <xloc>608</xloc>
-      <yloc>128</yloc>
-      <width>210</width>
-      <heigth>26</heigth>
+      <note>【Table output】
+truncate をon/offできるとよい</note>
+      <xloc>560</xloc>
+      <yloc>112</yloc>
+      <width>156</width>
+      <heigth>42</heigth>
+      <fontname>Yu Gothic UI</fontname>
+      <fontsize>9</fontsize>
+      <fontbold>N</fontbold>
+      <fontitalic>N</fontitalic>
+      <fontcolorred>0</fontcolorred>
+      <fontcolorgreen>0</fontcolorgreen>
+      <fontcolorblue>0</fontcolorblue>
+      <backgroundcolorred>255</backgroundcolorred>
+      <backgroundcolorgreen>205</backgroundcolorgreen>
+      <backgroundcolorblue>112</backgroundcolorblue>
+      <bordercolorred>100</bordercolorred>
+      <bordercolorgreen>100</bordercolorgreen>
+      <bordercolorblue>100</bordercolorblue>
+      <drawshadow>Y</drawshadow>
+    </notepad>
+    <notepad>
+      <note>【Extract】
+・CSV用のExtractorを実装
+</note>
+      <xloc>320</xloc>
+      <yloc>96</yloc>
+      <width>138</width>
+      <heigth>57</heigth>
+      <fontname>Yu Gothic UI</fontname>
+      <fontsize>9</fontsize>
+      <fontbold>N</fontbold>
+      <fontitalic>N</fontitalic>
+      <fontcolorred>0</fontcolorred>
+      <fontcolorgreen>0</fontcolorgreen>
+      <fontcolorblue>0</fontcolorblue>
+      <backgroundcolorred>255</backgroundcolorred>
+      <backgroundcolorgreen>205</backgroundcolorgreen>
+      <backgroundcolorblue>112</backgroundcolorblue>
+      <bordercolorred>100</bordercolorred>
+      <bordercolorgreen>100</bordercolorgreen>
+      <bordercolorblue>100</bordercolorblue>
+      <drawshadow>Y</drawshadow>
+    </notepad>
+    <notepad>
+      <note>以下を親ktrからパラメータで受け取る
+ "IN_FILE"
+ "EXTRACTOR"
+ "START_ROW"
+ "DB_URL"
+ "DB_SCHEMA"
+ "DB_TABLE"
+ "DB_USER"
+ "DB_PASSWORD"
+ "DB_PASSWORD"
+</note>
+      <xloc>16</xloc>
+      <yloc>16</yloc>
+      <width>184</width>
+      <heigth>185</heigth>
       <fontname>Yu Gothic UI</fontname>
       <fontsize>9</fontsize>
       <fontbold>N</fontbold>
@@ -554,7 +574,7 @@
   <order>
     <hop>
       <from>Extract</from>
-      <to>Table Loder</to>
+      <to>Table output</to>
       <enabled>Y</enabled>
     </hop>
   </order>
@@ -573,29 +593,50 @@
       <definition>
         <class_type>TRANSFORM_CLASS</class_type>
         <class_name>Processor</class_name>
-        <class_source>import java.io.*;
-import java.nio.file.*;
+        <class_source>import java.io.BufferedReader;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.Blob;
+import java.sql.Clob;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.activation.UnsupportedDataTypeException;
 import java.util.*;
+
 import org.pentaho.di.core.row.value.*;
+
+
+	/* ktrのパラメータとして受け取る */
+	static private String PARAM_IN_FILE = "IN_FILE";
+	static private String PARAM_START_ROW = "START_ROW";
+	static private String PARAM_DB_URL = "DB_URL";
+	static private String PARAM_DB_SCHEMA = "DB_SCHEMA";
+	static private String PARAM_DB_TABLE = "DB_TABLE";
+	static private String PARAM_DB_USER = "DB_USER";
+	static private String PARAM_DB_PASSWORD = "DB_PASSWORD";
 
 	/**
 	 * 変換を実行する内部クラス
 	 */
-	private class Converter {
+	private class ExtractorCSV {
 		/* ktr側で設定されているパラメータ */
-		// TODO: 外部jarにする際にstatic化
-		private String PARAM_IN_FILE= "IN_FILE";
-		private String PARAM_START_ROW = "START_ROW";
-		private String PARAM_OUT_TABLE = "OUT_TABLE";
 
 		private BufferedReader _reader = null;
-		private String _outTable = "";
 
 		/**
 		 * ファイルを読み込み初期化
 		 * @throws KettleException
 		 */
-		public void init() throws KettleException{
+		public void init() throws KettleException {
 			try {
 				/* パラメータで指定されたファイルを読み込む */
 				String filePathStr = getVariable(PARAM_IN_FILE);
@@ -605,41 +646,21 @@ import org.pentaho.di.core.row.value.*;
 
 				/* パラメータで指定された最初の行まで読み込む */
 				int startRow = Integer.parseInt(getVariable(PARAM_START_ROW));
-				for(int i = 0; i &lt; startRow; i++) {
+				for (int i = 0; i &lt; startRow; i++) {
 					_reader.readLine();
 				}
-
-				/* テーブル名を取得 */
-				_outTable = getVariable(PARAM_OUT_TABLE);
 
 			} catch (IOException e) {
 				throwAsKettleException(e);
 			}
 		}
 
-		public String getTableName() {
-			return _outTable;
-		}
-
-		/**
-		 * インポート対象のカラム名情報を返却する。
-		 *
-		 * @return
-		 */
-		public ValueMetaInterface[] getRowColumns() {
-			return new ValueMetaInterface[] {
-					new ValueMetaString("col1"),
-					new ValueMetaString("col2")
-			};
-		}
-
-
 		/**
 		 * ファイルを1行読み込んで配列を返す.
 		 *
 		 * @return 読み込んだデータ。終端の場合はnul値とする。
 		 */
-		public Object[] getRowData() throws KettleException {
+		public String[] getRowData() throws KettleException {
 			if (_reader == null) {
 				return null;
 			}
@@ -657,15 +678,11 @@ import org.pentaho.di.core.row.value.*;
 
 			/*
 			 * 必要に応じて変換処理
+			 *
+			 * TODO: DBの列に応じた型変換など
 			 */
-			// 大文字にする
+			// 例. 大文字にする
 			columnDatas[1] = toUpper(columnDatas[1]);
-
-			/* IDが5以上の場合はテーブルをTB2とする */
-			int id = Integer.parseInt(columnDatas[0]);
-			if (id >= 5) {
-				_outTable = "TB2";
-			}
 
 			return columnDatas;
 		}
@@ -690,58 +707,213 @@ import org.pentaho.di.core.row.value.*;
 		}
 	}
 
-	Converter converter = new Converter();
+	private ExtractorCSV _extractor = new ExtractorCSV();
+	private TableColumn[] _tableColumns = null;
+
+	public void dispose(StepMetaInterface smi, StepDataInterface sdi) {
+		super.dispose(smi, sdi);
+		logBasic("Extract: dispose()");
+		if (_extractor != null) {
+			try {
+				_extractor.close();
+			} catch (KettleException e) {
+			}
+		}
+	}
+	public void stopRunning(StepMetaInterface stepMetaInterface, StepDataInterface stepDataInterface)
+			throws KettleException {
+		super.stopRunning(stepMetaInterface, stepDataInterface);
+		logBasic("Extract: stopRunning()!");
+		if (_extractor != null) {
+			try {
+				_extractor.close();
+			} catch (KettleException e) {
+			}
+		}
+	}
 
 	/**
 	 * @return 次の行へ継続する場合はtrue, 終了する場合はfalse
 	 */
 	public boolean processRow(StepMetaInterface smi, StepDataInterface sdi) throws KettleException {
+		try {
+			/* 最初の1回目(1行目)はfirst == trueとなる */
+			if (first) {
+				//first = false;
+				logBasic("first");
 
-		/* 最初の1回目(1行目)はfirst == trueとなる */
-		if (first) {
-			first = false;
-			logBasic("first");
+				/* ファイルの読み込みと初期化 */
+				_extractor.init();
+			}
 
-			/* ファイルの読み込みと初期化 */
-			converter.init();
+			/* 行データを取得。最後の行はnullとなったら終了処理 */
+			String[] rowData = _extractor.getRowData();
+			if (rowData == null) {
+				logBasic("inputRow==null");
+				setOutputDone();
+				_extractor.close();
+				return false;
+			}
+
+			if (first) {
+				first = false;
+				/*
+				 * 出力する列データを設定
+				 *
+				 * ここで出力する列データ数はinsertする列数と同じでないとエラーとなる。
+				 * そのため、1行目のデータを取得時に処理を行う。
+				 *
+				 */
+				String url = getVariable(PARAM_DB_URL);
+				String user = getVariable(PARAM_DB_USER);
+				String pass = getVariable(PARAM_DB_PASSWORD);
+				String schema = getVariable(PARAM_DB_SCHEMA);
+				String table = getVariable(PARAM_DB_TABLE);
+				String schemaTable = schema + "." + table;
+				_tableColumns = getTableColumn(url, user, pass, schemaTable);
+				ValueMetaInterface[] valueMetaInterfaces = getTableValueMetaInterfaces(_tableColumns);
+
+				/* rowDataの数だけtableColumnsを追加する */
+				RowMetaInterface newFields = new RowMeta();
+				for (int i = 0; i &lt; rowData.length; i++) {
+					logBasic("tableColunns[" + i + "]=" + valueMetaInterfaces);
+					newFields.addValueMeta(valueMetaInterfaces[i]);
+				}
+				data.outputRowMeta.addRowMeta(newFields);
+			}
+
+
+			/* rowDataをテーブルの型に合わせたオブジェクトに変換する */
+			Object[] typedRowData = new Object[rowData.length];
+			for (int i = 0; i &lt; rowData.length; i++) {
+				typedRowData[i] = strintToObject(rowData[i], _tableColumns[i].type);
+			}
+
+			/*
+			 * 1行のデータを出力
+			 */
+			putRow(data.outputRowMeta, typedRowData);
+			logBasic("putRow");
+		} catch (Exception e) {
+			logError("getTableColumns()にてエラー", e);
+			throw new KettleException(e);
 		}
-
-		/* 行データを取得。最後の行はnullとなるので終了処理 */
-		Object[] rowData = converter.getRowData();
-		if (rowData == null) {
-			logBasic("inputRow==null");
-			setOutputDone();
-			converter.close();
-			return false;
-		}
-
-		/* テーブル名を取得して行データの先頭に入れる */
-		String tableName = converter.getTableName();
-		Object[] rowDataWithTable = new Object[rowData.length + 1];
-		System.arraycopy(new String[] {tableName}, 0, rowDataWithTable, 0, 1);
-		System.arraycopy(rowData, 0, rowDataWithTable, 1, rowData.length);
-
-		/*
-		 * 出力する列データを設定
-		 * クリアしてから再設定することで途中でカラム構成が変わっても対応する。
-		 * 1列目はテーブル名を入れる
-		 * */
-		RowMetaInterface newFields = new RowMeta();
-		newFields.addValueMeta(new ValueMetaString("table_name"));
-		ValueMetaInterface[] columns = converter.getRowColumns();
-		for (int i = 0; i &lt; columns.length; i++) {
-			newFields.addValueMeta(columns[i]);
-		}
-		data.outputRowMeta.clear();
-		data.outputRowMeta.addRowMeta(newFields);
-
-		/*
-		 * 1行のデータを出力
-		 */
-		putRow(data.outputRowMeta, rowDataWithTable);
-		logBasic("putRow");
 
 		return true;
+	}
+
+	/**
+	 * テーブルのカラムクラス
+	 */
+	private class TableColumn {
+		public String name;
+		public String type;
+
+		public TableColumn(String name, String type) {
+			this.name = name;
+			this.type = type;
+		}
+	}
+
+	/**
+	 * 指定されたテーブルの属性項目を返します。
+	 *
+	 * JDBCでDBMSへ接続して型情報から生成しますので、多用しないようにする必要あり。
+	 *
+	 * @param url
+	 * @param user
+	 * @param pass
+	 * @param table
+	 * @return
+	 */
+	private TableColumn[] getTableColumn(String url, String user, String pass, String table)
+			throws SQLException, IOException {
+		TableColumn[] columns = null;
+		// try()はKettleでエラーとなるためNG
+		//		try (Connection connection = DriverManager.getConnection(url, user, pass);
+		//				Statement stmt = connection.createStatement()) {
+
+		Connection connection = null;
+		try {
+			connection = DriverManager.getConnection(url, user, pass);
+			Statement stmt = connection.createStatement();
+			ResultSet resultSet = stmt.executeQuery("select * from " + table);
+			ResultSetMetaData metaData = resultSet.getMetaData();
+			int columnCount = metaData.getColumnCount();
+			columns = new TableColumn[columnCount];
+			for (int i = 0; i &lt; columnCount; i++) {
+				String colName = metaData.getColumnName(i + 1);
+				String typeName = metaData.getColumnClassName(i + 1);
+				logBasic("TableColumn[" + i + "]=" + colName + ", type=" + typeName);
+				columns[i] = new TableColumn(colName, typeName);
+			}
+		} finally {
+			if (connection != null) {
+				connection.close();
+			}
+		}
+
+		return columns;
+	}
+
+	private ValueMetaInterface[] getTableValueMetaInterfaces(TableColumn[] columns)
+			throws SQLException, IOException {
+		ValueMetaInterface[] vmis = new ValueMetaInterface[columns.length];
+		for (int i = 0; i &lt; vmis.length; i++) {
+			vmis[i] = getValueMetaInterface(columns[i].name, columns[i].type);
+		}
+
+		return vmis;
+	}
+
+	/**
+	 * 指定されたカラム名とJava型情報から{@link ValueMetaInterface}を返します。
+	 *
+	 * Java型との対応は{@link ValueMetaInterface}のJavaDocを参照。
+	 *
+	 * @param colName
+	 * @param typeName
+	 * @return
+	 * @throws UnsupportedDataTypeException
+	 */
+	private ValueMetaInterface getValueMetaInterface(String colName, String typeName)
+			throws UnsupportedDataTypeException {
+		if (Double.class.getName().equals(typeName) ||
+				Float.class.getName().equals(typeName)) {
+			return new ValueMetaNumber(colName);
+		} else if (String.class.getName().equals(typeName)) {
+			return new ValueMetaString(colName);
+		} else if (Date.class.getName().equals(typeName)) {
+			return new ValueMetaDate(colName);
+		} else if (Boolean.class.getName().equals(typeName)) {
+			return new ValueMetaBoolean(colName);
+		} else if (Long.class.getName().equals(typeName) || Integer.class.getName().equals(typeName)) {
+			/* Long型もValueMetaIntegerとなる */
+			return new ValueMetaInteger(colName);
+		} else if (BigDecimal.class.getName().equals(typeName)) {
+			return new ValueMetaBigNumber(colName);
+		} else if (Blob.class.getName().equals(typeName) ||
+				Clob.class.getName().equals(typeName)) {
+			return new ValueMetaBinary(colName);
+		} else if (java.sql.Timestamp.class.getName().equals(typeName)) {
+			return new ValueMetaTimestamp(colName);
+		}
+
+		throw new UnsupportedDataTypeException("Column=" + colName + ", Type=" + typeName);
+	}
+
+	private Object strintToObject(String value, String typeName) throws UnsupportedDataTypeException {
+		if (String.class.getName().equals(typeName)) {
+			return value;
+		} else if (Integer.class.getName().equals(typeName) || Long.class.getName().equals(typeName)) {
+			/* PDIではIntegerもLong型となる */
+			//return Integer.valueOf(value);
+			return Long.valueOf(value);
+		}
+		//TODO: 他の型も処理する
+
+		throw new UnsupportedDataTypeException("Value=" + value + ", Type=" + typeName);
+
 	}</class_source>
       </definition>
     </definitions>
@@ -759,13 +931,13 @@ import org.pentaho.di.core.row.value.*;
       </output>
     </remotesteps>
     <GUI>
-      <xloc>384</xloc>
+      <xloc>368</xloc>
       <yloc>192</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>Table Loder</name>
+    <name>Table output</name>
     <type>TableOutput</type>
     <description />
     <distribute>Y</distribute>
@@ -776,8 +948,8 @@ import org.pentaho.di.core.row.value.*;
       <schema_name />
     </partitioning>
     <connection>Derby_local_testDB</connection>
-    <schema>APP</schema>
-    <table>TB1</table>
+    <schema>${DB_SCHEMA}</schema>
+    <table>${DB_TABLE}</table>
     <commit>1000</commit>
     <truncate>N</truncate>
     <ignore_errors>N</ignore_errors>
@@ -787,8 +959,8 @@ import org.pentaho.di.core.row.value.*;
     <partitioning_field />
     <partitioning_daily>N</partitioning_daily>
     <partitioning_monthly>Y</partitioning_monthly>
-    <tablename_in_field>Y</tablename_in_field>
-    <tablename_field>table_name</tablename_field>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field />
     <tablename_in_table>N</tablename_in_table>
     <return_keys>N</return_keys>
     <return_field />
@@ -802,7 +974,7 @@ import org.pentaho.di.core.row.value.*;
       </output>
     </remotesteps>
     <GUI>
-      <xloc>688</xloc>
+      <xloc>608</xloc>
       <yloc>192</yloc>
       <draw>Y</draw>
     </GUI>
