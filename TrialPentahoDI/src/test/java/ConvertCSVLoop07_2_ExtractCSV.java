@@ -170,6 +170,32 @@ public class ConvertCSVLoop07_2_ExtractCSV extends TransformClassBase {
 	private ExtractorCSV _extractor = new ExtractorCSV();
 	private TableColumn[] _tableColumns = null;
 
+	// Kettleでエラーとなる
+	// @Override
+	/**
+	 * 一時停止の際に呼ばれる。
+	 */
+	public void dispose(StepMetaInterface smi, StepDataInterface sdi) {
+		super.dispose(smi, sdi);
+		logBasic("Extract: dispose()");
+	}
+	/**
+	 * 停止させた際に呼ばれる
+	 */
+	public void stopRunning(StepMetaInterface stepMetaInterface, StepDataInterface stepDataInterface)
+			throws KettleException {
+		super.stopRunning(stepMetaInterface, stepDataInterface);
+		logBasic("Extract: stopRunning()!");
+		if (_extractor != null) {
+			try {
+				_extractor.close();
+			} catch (KettleException e) {
+			}
+		}
+	}
+
+
+
 	/**
 	 * @return 次の行へ継続する場合はtrue, 終了する場合はfalse
 	 */

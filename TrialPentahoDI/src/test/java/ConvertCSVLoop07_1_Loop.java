@@ -85,6 +85,21 @@ public class ConvertCSVLoop07_1_Loop extends TransformClassBase {
 	private String[][] _allParams = null;
 	private int _currentIdx = 0;
 
+
+	// Kettleでエラーとなる
+	// @Override
+	public void dispose(StepMetaInterface smi, StepDataInterface sdi) {
+		super.dispose(smi, sdi);
+		logBasic("TableLoop: dispose()");
+	}
+	public void stopRunning(StepMetaInterface stepMetaInterface, StepDataInterface stepDataInterface)
+			throws KettleException {
+		super.stopRunning(stepMetaInterface, stepDataInterface);
+		logBasic("TableLoop: stopRunning()!");
+	}
+
+
+
 	/**
 	 * @return 次の行へ継続する場合はtrue, 終了する場合はfalse
 	 */

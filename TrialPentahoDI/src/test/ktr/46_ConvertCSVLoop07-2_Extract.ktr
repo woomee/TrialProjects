@@ -709,6 +709,28 @@ import org.pentaho.di.core.row.value.*;
 	private ExtractorCSV _extractor = new ExtractorCSV();
 	private TableColumn[] _tableColumns = null;
 
+	public void dispose(StepMetaInterface smi, StepDataInterface sdi) {
+		super.dispose(smi, sdi);
+		logBasic("Extract: dispose()");
+		if (_extractor != null) {
+			try {
+				_extractor.close();
+			} catch (KettleException e) {
+			}
+		}
+	}
+	public void stopRunning(StepMetaInterface stepMetaInterface, StepDataInterface stepDataInterface)
+			throws KettleException {
+		super.stopRunning(stepMetaInterface, stepDataInterface);
+		logBasic("Extract: stopRunning()!");
+		if (_extractor != null) {
+			try {
+				_extractor.close();
+			} catch (KettleException e) {
+			}
+		}
+	}
+
 	/**
 	 * @return 次の行へ継続する場合はtrue, 終了する場合はfalse
 	 */
