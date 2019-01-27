@@ -1,0 +1,15 @@
+spring:
+  devtools:
+    restart:
+      enabled: true 
+      exclude: "static/**, public/**"
+      additional-exclude: "**/*.xml" 
+      #additional-paths: ['src/main/resources/sql']
+      trigger-file: .reload
+      
+server:
+   port: 1234
+   
+
+greeting:
+   app: custom
