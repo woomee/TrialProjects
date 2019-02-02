@@ -16,7 +16,6 @@ public class GreetingConfig implements WebMvcConfigurer  {
 	 */
 	@Value("${greeting.app}")
 	private String app;
-
 	public String getApp() {
 		return app;
 	}
@@ -46,7 +45,7 @@ public class GreetingConfig implements WebMvcConfigurer  {
 
 
 	//NG:
-	// クラスパス直下を読みに行くがサーブレ�?トが動作しなくなる�?�でNG
+	// クラスパス直下を読みに行くがサーブレットが動作しなくなるのでNG
 //	@Override
 //	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 //		registry.addResourceHandler("/**")
