@@ -1,6 +1,5 @@
 package proto.greeting.common;
 
-import java.io.File;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,36 +24,13 @@ public class GreetingRequestMappingHandlerMapping extends RequestMappingHandlerM
 
 
 		if (hasServletMappping(appPath, request)) {
-			HttpServletRequest customReq = new CustomHttpServletRequest(request, appName);
+			HttpServletRequest customReq = new CustomHttpServletRequest(request, appPath);
 			return super.lookupHandlerMethod(appPath, customReq);
 		}
-
-		if (hasFileMapping(appPath, request)) {
-			HttpServletRequest forwardReq = new ForwardHttpServletRequest(request, appPath);
-			return super.lookupHandlerMethod(forwardReq.getServletPath(), forwardReq);
-		}
-
 
 		return super.lookupHandlerMethod(lookupPath, request);
 	}
 
-	private boolean hasMappping(String appPath, HttpServletRequest request) {
-		return hasServletMappping(appPath, request) || hasFileMapping(appPath, request);
-
-	}
-
-	/**
-	 * 指定されたパスのファイルが存在すればtrue
-	 *
-	 * @param appPath
-	 * @param request
-	 * @return
-	 */
-	private boolean hasFileMapping(String appPath, HttpServletRequest request) {
-		String appRealPath = request.getServletContext().getRealPath(appPath);
-		File appFile = new File(appRealPath);
-		return appFile.exists();
-	}
 
 	/**
 	 * 指定されたパスを持つサーブレットがあればtrue
@@ -85,6 +61,7 @@ public class GreetingRequestMappingHandlerMapping extends RequestMappingHandlerM
 //			}
 //		}
 //		return false;
+		// Streamを使った実装
 		return handlerMap.keySet().stream()
 					.anyMatch(v -> v.getPatternsCondition().getPatterns().stream()
 					.anyMatch(v2 -> v2.equals(appPath)));
@@ -98,56 +75,19 @@ public class GreetingRequestMappingHandlerMapping extends RequestMappingHandlerM
 	/**
 	 * PathのURLを変更するためのHttpServletRequest
 	 *
+	 * getServletPath()を指定されたURLに変更している
 	 *
 	 */
 	private static class CustomHttpServletRequest extends HttpServletRequestWrapper {
-		private String appName;
-		public CustomHttpServletRequest(HttpServletRequest request, String appName) {
+		private String appPath;
+		public CustomHttpServletRequest(HttpServletRequest request, String appPath) {
 			super(request);
-			this.appName = appName;
+			this.appPath = appPath;
 		}
 
 		@Override
 		public String getServletPath() {
-			return replaceCommonPath(super.getServletPath());
-		}
-
-		@Override
-		public String getRequestURI() {
-			return replaceCommonPath(super.getRequestURI());
-		}
-
-		@Override
-		public StringBuffer getRequestURL() {
-			String appUrl = replaceCommonPath(super.getRequestURL().toString());
-			return new StringBuffer(appUrl);
-		}
-
-		private String replaceCommonPath(String commonPath) {
-			return commonPath.replace("/common", "/" + this.appName);
+			return this.appPath;
 		}
 	}
-
-
-	private static class ForwardHttpServletRequest extends HttpServletRequestWrapper {
-		private String forwardPath;
-		public ForwardHttpServletRequest(HttpServletRequest request, String forwardPath) {
-			super(request);
-			this.forwardPath = forwardPath;
-		}
-
-		@Override
-		public String getServletPath() {
-			return "/common/forward?url=" + forwardPath;
-//			return "/common/forward";
-		}
-
-//		@Override
-//		public String getQueryString() {
-//			return "url=" + forwardPath;
-//		}
-
-
-	}
-
 }
