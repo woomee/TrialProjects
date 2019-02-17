@@ -13,16 +13,23 @@ $( function() {
     });
 
     // 検索結果リストの設定
-    $( "#selectable" ).selectable({
-        stop: function() {
-          var result = $( "#select-result" ).empty();
-          $( ".ui-selected", this ).each(function() {
-            var index = $( "#selectable li" ).index( this );
-            result.append( " #" + ( index + 1 ) );
-          });
+    // $( "#selectable" ).selectable({
+    //     stop: function() {
+    //       var index = $( "#selectable li" ).index( this );
+    //     }
+    // });
+    
+    // JSONから追加
+    $.getJSON(
+      'data/search-result.json',
+      function(data) {
+        var newsList = data["news-list"];
+        for(var i=0; i<newsList.length; i++) {
+          $("#selectable").append("<li class=\"ui-widget-content\">" + newsList[i] + "</li>");
         }
-    });
-    
-    
+
+        $( "#selectable" ).selectable();
+      }
+    );
 
 });
