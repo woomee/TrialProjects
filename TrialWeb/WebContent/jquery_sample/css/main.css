@@ -1,0 +1,43 @@
+
+html,body {
+    height:100%;
+    padding: 0px;
+    margin: 0px;
+}
+#site-box {
+    width : 100%;
+    height: 100%;
+    padding: 0px;
+    margin: 0px;
+}
+
+#header-box {
+    height: 200px;
+    border: 1px solid #000000;
+    background-image: url('../images/header_background.png');
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+#left-box {
+    float: left;
+    width: 200px;
+    /* header-box, footer-box, borderによって変更する　*/
+    height: calc(100% - 200px - 30px - 6px);
+    border: 1px solid #000000;
+}
+
+#right-box {
+    float: right;
+    /* left-box、borderの太さによって変更する */
+    width: calc(100% - 200px - 4px);
+    /* header-box, footer-box, borderによって変更する　*/
+    height: calc(100% - 200px - 30px - 6px);
+    border: 1px solid #000000;
+}
+
+#footer-box {
+    clear: both;
+    height: 30px;
+    border: 1px solid #000000;
+}

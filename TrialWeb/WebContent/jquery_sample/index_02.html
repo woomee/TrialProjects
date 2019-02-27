@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>サンプルページ02</title>
+  
+    <link rel="stylesheet" type="text/css" href="css/main.css" />
+    <link rel="stylesheet" type="text/css" href="css/left-box.css" />
+    <link rel="stylesheet" type="text/css" href="css/right-box.css" />
+
+    <!-- jQuery UI  TODO: (ダウンロードしたものに変更する) -->
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <!--  スタイルのテーマ
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/eggplant/jquery-ui.css">
+    -->
+     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/ui-darkness/jquery-ui.css">
+    
+    <!-- 開発するJS-->
+    <script src="js/main.js"></script>
+ </head>
+
+<body>
+<div id="site-box">
+    <div id="header-box">
+        header-box
+    </div>
+    <div id="left-box">
+        <ol id="selectable">
+            <li class="ui-widget-content">Item 1</li>
+            <li class="ui-widget-content">Item 2</li>
+            <li class="ui-widget-content">Item 3</li>
+            <li class="ui-widget-content">Item 4</li>
+            <li class="ui-widget-content">Item 5</li>
+            <li class="ui-widget-content">Item 6</li>
+        </ol>
+    </div>
+    <div id="right-box">
+        <div id="tabs">
+            <ul>
+                <li><a href="#tab1">地図</a></li>
+                <li><a href="#tab2">タブ2</a></li>
+                <li><a href="#tab3">タブ3</a></li>
+            </ul>
+            <div id="tab1">
+                <div id="map"></div>
+            </div>
+            <div id="tab2">
+                tab2
+            </div>
+            <div id="tab3">
+                tab3
+            </div>
+        </div>
+    </div>
+    <div id="footer-box">
+        footer-box
+    </div>
+</div>
+</body> 
+</html>

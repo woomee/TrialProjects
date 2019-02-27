@@ -1,0 +1,9 @@
+#map {
+    background-image: url('../images/map_all_00.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 100%;
+    /* height: 100%;   効かない */
+    /* height: calc(100% - 200px); 効かない*/
+    height: 550px;  /* TODO: 要検討 */
+}
