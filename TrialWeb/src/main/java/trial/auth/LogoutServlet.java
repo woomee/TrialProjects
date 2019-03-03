@@ -9,6 +9,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+/**
+ * ログアウト処理としてセッションを破棄する
+ *
+ * @author umino
+ *
+ */
 @WebServlet(name="LogoutServlet", urlPatterns = "/logout")
 public class LogoutServlet extends HttpServlet {
 
