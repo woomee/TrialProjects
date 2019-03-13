@@ -24,6 +24,16 @@ public class GreetingFilter extends OncePerRequestFilter {
 
 		/*  /commonを/{appName}でリプレースしてパスを検索 */
 		String requestPath = request.getRequestURI();
+
+		/*
+		 * ContextPathは除外
+		 *
+		 * TomcatではContextPathが含まれ、
+		 * 後処理で利用するgetRealPath()やgetRequestDispatcher()でパス合わなくなるため除去する
+		 *
+		 */
+		requestPath = requestPath.replace(request.getContextPath(), "");
+
 		String appPath = requestPath.replace("/common", "/" + this.appName);
 
 		// NG: Springのサーブレットマッピングは取得できない

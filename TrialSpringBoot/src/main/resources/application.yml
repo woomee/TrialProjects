@@ -8,7 +8,9 @@ spring:
       trigger-file: .reload
       
 server:
-   port: 1234
+  servlet:
+    context-path: /TrialSpringBoot
+  port: 1234
    
 
 greeting:
