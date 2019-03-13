@@ -56,3 +56,21 @@ $ curl -s http://localhost:1234/common/index.html
 </html>
  ⇒ リクエストがcommon/index.htmlでもcustom/index.htmlが返る!!
 ```
+
+# 注意事項
+- Tomcatで実行する場合はコンテキストパスがあるので除去する必要がある。
+	- 除去しないとgetRealPath()やgetRequestDispatcher()で余計なパスとなってしまう。
+- 例
+	```
+	http://xxxx/TrialSpringBoot/index.html の場合において
+	RealPathがC:\TrialSpringBoot\WebContent\index.htmlとする。
+    ```
+
+	- (パターン1) getRealPath("/index.html")とすると
+	    - ⇒ "C:\TrialSpringBoot\WebContent\index.html"になるので正しい。
+
+	- (パターン2)　 getRealPath("/TrialSpringBoot/index.html")とすると
+	    - ⇒"C:\TrialSpringBoot\TrialSpringBoot\WebContent\index.html"になってしまう。
+
+    - Springの内部Webサーバで実行するとコンテキストパスが無いため(パターン1)で正常に動作
+    - Tomcatになるとコンテキストパスがあるため、(パターン2)のような状態になっていた。
