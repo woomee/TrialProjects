@@ -35,12 +35,12 @@ gradle bootRun
     plugins {
         (省略)....
     id 'eclipse'
-    }    
+    }
     ```
-    1. gradle eclipseを実行してプロジェクトファイルを生成してEclipse上からインポート   
+    1. gradle eclipseを実行してプロジェクトファイルを生成してEclipse上からインポート
         ```
         > gradle eclipse
-        ``` 
+        ```
     1. インポート後にプロジェクトにGradleのネイチャーを追加
 1. リポジトリにmavenを追加
     ```
@@ -100,6 +100,11 @@ gradle bootRun
             testCompile('org.springframework.boot:spring-boot-starter-webflux')
             ...
     ```
+
+# SpringBootをTomcatで利用するには
+- @SpringBootApplicationのクラスはSpringBootServletInitializerクラスを継承すること
+- configureメソッドをoverrideすること
+- (参考) https://qiita.com/NagaokaKenichi/items/3f191aeb6f161101d5f6
 
 # その他
 - Spring Boot 使い方メモ
