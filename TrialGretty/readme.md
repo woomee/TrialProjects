@@ -18,4 +18,4 @@ JUnitだけでなく、Seleniumを使ったテストも行っている
 - Tomcatが立ち上がらない。Grettyの問題。
 
 # 参照
-https://guides.gradle.org/building-java-web-applications/
+- https://guides.gradle.org/building-java-web-applications/
