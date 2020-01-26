@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  tomcat:
+    image: "tomcat:9.0.30-jdk11-adoptopenjdk-openj9"
+#    image: "tomcat:9.0.30-jdk11-openjdk"
+    ports:
+        - "8000:8000"
+        - "18080:8080"
+    volumes: 
+        - "./docker/tomcat/conf:/usr/local/tomcat/conf"
+        - "./WebContent:/usr/local/tomcat/webapps/TrialWeb" 
+    environment: 
+        - JPDA_ADDRESS=0.0.0.0:8000
+    command: >
+        bash -c "cd /usr/local/tomcat/bin &&
+        catalina.sh jpda run"
