@@ -39,8 +39,8 @@
     <login-config>
         <auth-method>FORM</auth-method>
         <form-login-config>
-            <form-login-page>/login.jsp</form-login-page>
-            <form-error-page>/login_err.html</form-error-page>
+            <form-login-page>/auth/form/login.jsp</form-login-page>
+            <form-error-page>/auth/form/login_err.html</form-error-page>
         </form-login-config>
     </login-config>
 

@@ -1,0 +1,64 @@
+apply {
+	plugin 'java'
+//	plugin 'findbugs'
+//	plugin 'checkstyle'
+
+}
+
+repositories {
+    //jcenter()
+    mavenCentral()
+}
+
+dependencies {
+    compile fileTree(dir: "WebContent/WEB-INF/lib", include: '*.jar')
+
+	compile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
+	compile group: 'javax.websocket', name: 'javax.websocket-api', version: '1.1'
+
+	testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.1.0'
+    testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.1.0'    
+}
+
+[compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
+
+
+/* Eclipseのクラス出力先を統一 */
+apply plugin: 'eclipse'
+import org.gradle.plugins.ide.eclipse.model.SourceFolder
+eclipse {
+    classpath {
+        defaultOutputDir = file('build/classes')
+        file.whenMerged {cp ->
+            cp.entries.findAll { it instanceof SourceFolder && it.path.startsWith("src/") }*.output = "build/classes"
+        }
+    }
+}
+
+apply plugin: 'jacoco'
+task jacoco(type: JacocoReport, dependsOn: 'test') {
+    sourceSets sourceSets.main
+    executionData = files(tasks.jacocoTestReport.executionData)
+    reports {
+        html.enabled = true
+        xml.enabled = true
+        csv.enabled = true
+    }
+}
+jacoco {
+    toolVersion = "0.7.+"
+    // reportsDir = file("$buildDir/reports/jacoco")
+}
+
+
+/* 依存するライブラリを取得 */
+def dependenciesCopyTargetDirName = 'build/dependencies'
+task copyDependencies(type: Copy) {
+	// 一旦ディレクトリは消す
+	delete dependenciesCopyTargetDirName;
+
+	// 関連のあるJarを全てコピーする
+	from configurations.testRuntime
+ 	into dependenciesCopyTargetDirName
+}
+

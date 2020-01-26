@@ -31,11 +31,11 @@ public class LogoutServlet extends HttpServlet {
 		}
 
 		/* 認証エリア（ログインページ)へ戻す */
-		String transUrl = req.getContextPath() +   "/basic/";
+		String transUrl = req.getContextPath() +   "/auth/basic/";
 		int status = 401;
 		System.out.println("Tranfer URL=" + transUrl +  ", Set status " + status);
 //		resp.setStatus(status);
-		resp.sendRedirect(req.getContextPath() +   "/basic/");
+		resp.sendRedirect(transUrl);
 		//req.getRequestDispatcher("/basic").forward(req, resp);
 
 	}

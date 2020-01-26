@@ -1,4 +1,4 @@
-apply from:"../SamplePrograms/default.gradle"
+apply from:"../default.gradle"
 
 dependencies {
 	compile group: 'javax.mail', name: 'mail', version: '1.4.7'
