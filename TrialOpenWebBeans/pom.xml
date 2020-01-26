@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- OpenWebBeansを使ったCDIのサンプル
+
+ -->
+
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+    <groupId>maven.owb</groupId>
+    <artifactId>owb</artifactId>
+    <version>0.0.1</version>
+
+	<description>Open Web Beans</description>
+
+    <properties>
+<!--
+		<owb.version>1.7.6</owb.version>
+		<owb.version>2.0.11</owb.version>
+ -->
+		<owb.version>2.0.13</owb.version>
+    </properties>
+
+
+	<dependencies>
+		<!-- APIs for OWB-2.0.x -->
+		<dependency>
+		    <groupId>org.apache.geronimo.specs</groupId>
+		    <artifactId>geronimo-atinject_1.0_spec</artifactId>
+		    <version>1.0</version>
+		</dependency>
+
+		<dependency>
+		    <groupId>org.apache.geronimo.specs</groupId>
+		    <artifactId>geronimo-jcdi_2.0_spec</artifactId>
+		    <version>1.0.1</version>
+		</dependency>
+
+		<dependency>
+		    <groupId>org.apache.geronimo.specs</groupId>
+		    <artifactId>geronimo-interceptor_1.2_spec</artifactId>
+		    <version>1.0</version>
+		</dependency>
+
+		<dependency>
+		    <groupId>org.apache.geronimo.specs</groupId>
+		    <artifactId>geronimo-annotation_1.3_spec</artifactId>
+		    <version>1.0</version>
+		</dependency>
+
+		<!-- APIs for OWB-1.7.x -->
+		<!--
+		<dependency>
+		    <groupId>org.apache.geronimo.specs</groupId>
+		    <artifactId>geronimo-atinject_1.0_spec</artifactId>
+		    <version>1.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.geronimo.specs</groupId>
+		    <artifactId>geronimo-jcdi_1.1_spec</artifactId>
+		    <version>1.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.geronimo.specs</groupId>
+		    <artifactId>geronimo-interceptor_1.2_spec</artifactId>
+		    <version>1.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.geronimo.specs</groupId>
+		    <artifactId>geronimo-annotation_1.2_spec</artifactId>
+		    <version>1.0</version>
+		</dependency>
+		 -->
+
+		<!-- Required -->
+		<dependency>
+		    <groupId>org.apache.openwebbeans</groupId>
+		    <artifactId>openwebbeans-spi</artifactId>
+		    <version>${owb.version}</version>
+		    <scope>compile</scope>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.openwebbeans</groupId>
+		    <artifactId>openwebbeans-impl</artifactId>
+		    <version>${owb.version}</version>
+		    <scope>compile</scope>
+		</dependency>
+
+		<!-- Plugins -->
+		<dependency>
+		    <groupId>org.apache.openwebbeans</groupId>
+		    <artifactId>openwebbeans-web</artifactId>
+		    <version>${owb.version}</version>
+		    <scope>compile</scope>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.openwebbeans</groupId>
+		    <artifactId>openwebbeans-tomcat7</artifactId>
+		    <version>${owb.version}</version>
+		    <scope>compile</scope>
+		</dependency>
+
+	</dependencies>
+
+
+</project>
