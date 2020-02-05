@@ -16,8 +16,12 @@ dependencies {
 	compile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
 	compile group: 'javax.websocket', name: 'javax.websocket-api', version: '1.1'
 
-	testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.1.0'
-    testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.1.0'    
+    // JUnit5を追加。個別で追加するより'junit-jupiter'のみで良い
+    // testCompile group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.6.0'
+    // testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.6.0'
+    // testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.6.0'
+    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.6.0'
+    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.2.4'
 }
 
 [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
@@ -59,6 +63,7 @@ task copyDependencies(type: Copy) {
 
 	// 関連のあるJarを全てコピーする
 	from configurations.testRuntime
+//	from configurations.default
  	into dependenciesCopyTargetDirName
 }
 
