@@ -1,0 +1,322 @@
+<!--
+    Three.jsで作るWebVRの操作面について考える【注視点カーソル
+    https://cardboardclub.jp/lab/ctrl-cursor/
+
+    [メモ]
+    - 上記URLのページのソースを改造
+      - Cubeは動かないで固定とする
+      - html/jsを1つのhtmlファイルにまとめる
+    - デバイスの視点に追従しないが、ドラックすれば動く
+      - ⇒ Androidはhttpsにすることでデバイスに追従
+           iOS13以後はhttpsに加えて、DeviceOrientationEvent.requestPermission()によって追従するようになる
+-->
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="keywords" content="">
+  <meta name="description" content="">
+  <title>webVRサンプル｜localテスト</title>
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+
+  <style>
+<!--
+    *{
+      margin: 0;
+      padding: 0;
+    }
+    #base{
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 9000px;
+      z-index: -1;
+    }
+    #world {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+    #cursors{
+      position: absolute;
+      display: table;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+    }
+    #cursors .cursor{
+      position: absolute;
+      width: 0;
+      height: 0;
+      top: 50%;
+    }
+    #cursors .cursor-l{
+      left: 25%;
+      margin-left: -10px;
+    }
+    #cursors .cursor-r{
+      right: 25%;
+      margin-right: -10px;
+    }
+
+    #cursors .cursor .dot{
+      position: relative;
+      width: 10px;
+      height: 10px;
+      margin-top: -5px;
+      margin-left: -5px;
+      border-radius: 50%;
+      background: #f00;
+      opacity: 0.5;
+    }
+    #log {
+      position: absolute;
+      top: 50px;
+    }
+-->
+  </style>
+
+<!-- Three.js r73を利用 （オリジナルと同じバージョン ) -->
+<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+<script type="text/javascript" src="../lib/three.js-r73/build/three.min.js"></script>
+<script type="text/javascript" src="../lib/three.js-r73/examples/js/controls/OrbitControls.js"></script>
+<script type="text/javascript" src="../lib/three.js-r73/examples/js/controls/DeviceOrientationControls.js"></script>
+<script type="text/javascript" src="../lib/three.js-r73/examples/js/effects/StereoEffect.js"></script>
+<script type="text/javascript" src="../lib/three.js-r73/examples/js/Detector.js"></script>
+<script type="text/javascript" src="../lib/three.js-r73/examples/js/libs/stats.min.js"></script>
+
+<script type="text/javascript">
+  var container;
+  var camera, scene, renderer, element, controls;
+  var group;
+  var baseColor=0xffffff;
+
+  //THREE.Raycaster用
+  var raycaster,scopedObj;
+  var cursor= new THREE.Vector2(0,0);
+  
+  $(function() {
+    if ( ! Detector.webgl ){
+      Detector.addGetWebGLMessage();
+    }else{
+      init();
+      animate();
+    }
+  });
+  
+  function init(){
+    scene = new THREE.Scene();
+    container = document.getElementById('world');
+  
+    camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 1, 10000 );
+    camera.position.z = 2000;
+
+    renderer = new THREE.WebGLRenderer({ alpha: true });
+    renderer.setPixelRatio( window.devicePixelRatio );
+    renderer.setClearColor(baseColor);
+    container.appendChild( renderer.domElement );
+
+    /* 注視点の処理をするTHREE.Raycaster */
+    raycaster = new THREE.Raycaster();    
+
+    /* Light */
+    ambLight = new THREE.AmbientLight( 0xffffff, 0.5 );
+    scene.add( ambLight );
+    dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
+    dirLight.position.set( 1,1,1 );
+    scene.add( dirLight );
+  
+    /* マウス操作イベント */
+    controls = new THREE.OrbitControls(camera);
+    //[trial] このAPIはTheee.js r72には無い
+    //controls.rotateUp(Math.PI / 4);
+    controls.target.set(
+      camera.position.x + 0.1,
+      camera.position.y,
+      camera.position.z + 1
+    );
+    controls.noZoom = true;
+    controls.noPan = true;
+  
+    //ジャイロに切り替え
+    function setOrientationControls(e) {
+      log('alpha:' + e.alpha);
+      log('beta:' + e.beta);
+      log('gamma:' + e.gamma);
+  
+      if (!e.alpha) {
+        return;
+      }
+      controls = new THREE.DeviceOrientationControls(camera, true);
+      controls.connect();
+      controls.update();
+      /* リスナは除去する　*/
+      window.removeEventListener('deviceorientation', setOrientationControls, true);
+      log ("Remove deviceorientation listener")
+    }
+    if( window.DeviceOrientationEvent ){
+      //. iOS13 以上であれば DeviceOrientationEvent.requestPermission 関数が定義されているので、ここで条件分岐
+      if( DeviceOrientationEvent.requestPermission && typeof DeviceOrientationEvent.requestPermission === 'function' ){
+        //. iOS 13 以上の場合、
+        //. ユーザーに「許可」を求めるダイアログを表示
+        DeviceOrientationEvent.requestPermission().then( function( response ){
+          log("ClickRequestDeviceSensor: Response: " + response);
+          if( response === 'granted' ){
+            //. 許可された場合のみイベントハンドラを追加できる
+            window.addEventListener( 'deviceorientation', setOrientationControls, true );
+          }
+        });
+      } else{
+        //. Android または iOS 13 未満の場合、
+        //. DeviceOrientationEvent オブジェクトが有効な場合のみ、deviceorientation イベント発生時に setOrientationControls 関数がハンドリングするよう登録
+        window.addEventListener( "deviceorientation", setOrientationControls, true );
+      }
+    }
+    log("Add deviceorientation listener");
+  
+    //両眼カメラレンダリング
+    effect = new THREE.StereoEffect( renderer );
+  
+    /* 描画状態の表示 */
+    stats = new Stats();
+    stats.domElement.style.position = 'absolute';
+    stats.domElement.style.top = '0px';
+    container.appendChild( stats.domElement );
+    
+    /* 奥の図形を霞ませるfog効果 */
+    scene.fog = new THREE.Fog( baseColor, 500, cubeAreaSize );
+
+    /* ウインドウリサイズ時のイベント処理 */
+    window.addEventListener( 'resize', resize, false );
+    setTimeout(resize, 1);
+    
+    /* サンプル図形の生成 */
+    makeCubes();
+  }
+  
+  /* デバック用にログ表示　*/
+  function log(msg) {
+    var logDiv = document.getElementById("log");
+    logDiv.innerHTML += (msg + "<br/>");
+  }
+  
+  
+  function resize() {
+    var width = window.innerWidth;
+    var height = window.innerHeight;
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+    effect.setSize( width, height );
+  }
+  
+  function update(){
+    cubeUpdate();
+  }
+  function render() {
+    controls.update();
+    /* Effect内で実施しているためrendererはコメントアウト */
+    //renderer.render( scene, camera );
+    effect.render( scene, camera );
+ 
+    /* 注視点に乗っているオブジェクトを取得 */
+    raycaster.setFromCamera( cursor, camera );
+    var intersects = raycaster.intersectObjects( group.children );
+    if ( intersects.length > 0 ) {
+      if ( scopedObj != intersects[ 0 ].object ) {
+        if ( scopedObj ) scopedObj.scale.set(1,1,1);
+        scopedObj = intersects[ 0 ].object;
+        scopedObj.scale.set(2,2,2);
+      }
+    } else {
+      if ( scopedObj ) scopedObj.scale.set(1,1,1);
+      scopedObj = null;
+    }
+
+  }
+  function animate() {
+    requestAnimationFrame( animate );
+    //[trial] Cubeは動かないようにする
+    //update();
+    render();
+    stats.update();
+  }
+  
+  
+  /* CUBEの作成 */
+  var cubeColors=[
+    0x3369e8,
+    0xd50f25,
+    0xeeb211,
+    0x009925
+  ];
+  var cubes=[],
+  cubeCnt=300,
+  cubeSizeBase=100,
+  cubeSizeRnd=300,
+  cubeAreaSize=12000;
+  
+  function makeCubes(){
+    group = new THREE.Group();
+    scene.add( group );
+    for(var i=0;i<cubeCnt;i++){
+      var cube=new Cube();
+      group.add(cube.obj);
+      cubes.push(cube);
+    }
+  }
+  
+  function cubeUpdate(){
+    for(var i=0; i<cubes.length; i++){
+      cubes[i].update();
+    }
+  }
+  
+  var Cube=function() {
+    var size=Math.random()*cubeSizeRnd+cubeSizeBase;
+    this.geometry=new THREE.BoxGeometry( size, size, size );
+    this.material=new THREE.MeshPhongMaterial({color:cubeColors[Math.floor(Math.random()*cubeColors.length)]});
+    this.obj=new THREE.Mesh( this.geometry, this.material );
+    this.obj.position.x=Math.random()*cubeAreaSize-cubeAreaSize/2;
+    this.obj.position.y=Math.random()*cubeAreaSize-cubeAreaSize/2;
+    this.obj.position.z=camera.position.z+(Math.random()*cubeAreaSize*2-cubeAreaSize);
+    this.obj.rotation.x=Math.random()*2*Math.PI;
+    this.obj.rotation.y=Math.random()*2*Math.PI;
+    this.zSpeed=-(Math.random()*100+50);
+    this.rSpeedX=Math.random()*0.2-0.1;
+    this.rSpeedY=Math.random()*0.2-0.1;
+  };
+  Cube.prototype={
+    update:function(){
+      if(this.obj.position.z<camera.position.z-cubeAreaSize-1000){
+        this.obj.position.z=camera.position.z+cubeAreaSize;
+        this.obj.position.x=Math.random()*cubeAreaSize-cubeAreaSize/2;
+        this.obj.position.y=Math.random()*cubeAreaSize-cubeAreaSize/2;
+      }
+      this.obj.position.z+=this.zSpeed;
+      this.obj.rotation.x+=this.rSpeedX;
+      this.obj.rotation.y+=this.rSpeedY;
+    }
+  };
+  </script>
+
+
+</head>
+
+
+
+<body>
+  <div id="base"></div>
+  <div id="world">
+    <div id="cursors">
+      <div class="cursor cursor-l"><p class="dot"></p></div>
+      <div class="cursor cursor-r"><p class="dot"></p></div>
+    </div>    
+  </div>
+  <div id="log"></div>
+</body>
+
+</html>
