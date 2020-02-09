@@ -1,5 +1,6 @@
 .gradle
 build
+WebContent/lib
 WebContent/WEB-INF/classes
 WebContent/WEB-INF/lib
 WebContent/META-INF
