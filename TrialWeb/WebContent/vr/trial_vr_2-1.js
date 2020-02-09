@@ -63,13 +63,14 @@ function init(){
  
 //  window.addEventListener('deviceorientation', setOrientationControls, true);
   if( window.DeviceOrientationEvent ){
+    log("DeviceOrientationEvent: True");
     //. iOS13 以上であれば DeviceOrientationEvent.requestPermission 関数が定義されているので、ここで条件分岐
     if( DeviceOrientationEvent.requestPermission && typeof DeviceOrientationEvent.requestPermission === 'function' ){
+      log("DeviceOrientationEvent.requestPermission: True");
       //. iOS 13 以上の場合、
       //. ユーザーに「許可」を求めるダイアログを表示
       DeviceOrientationEvent.requestPermission().then( function( response ){
         log("ClickRequestDeviceSensor: Response: " + response);
-
         if( response === 'granted' ){
           //. 許可された場合のみイベントハンドラを追加できる
           window.addEventListener( 'deviceorientation', setOrientationControls, true );
