@@ -19,7 +19,7 @@
 	        <web-resource-name>
 	            Authentication of BasicAuth
 	        </web-resource-name>
-	        <url-pattern>/*</url-pattern>
+	        <url-pattern>/auth/*</url-pattern>
 	    </web-resource-collection>
 	    <auth-constraint>
 	        <role-name>tomcat</role-name>
