@@ -9,5 +9,4 @@ services:
         #tty: true
         command: >
             sh -c "echo '--modules-folder WebContent/lib_node' > .yarnrc &&
-            yarn add three@0.90 &&
-            jquery@3.4.1"
+            yarn install"
