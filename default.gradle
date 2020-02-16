@@ -42,7 +42,7 @@ eclipse {
 apply plugin: 'jacoco'
 task jacoco(type: JacocoReport, dependsOn: 'test') {
     sourceSets sourceSets.main
-    executionData = files(tasks.jacocoTestReport.executionData)
+    //executionData = files(tasks.jacocoTestReport.executionData)
     reports {
         html.enabled = true
         xml.enabled = true
@@ -50,7 +50,7 @@ task jacoco(type: JacocoReport, dependsOn: 'test') {
     }
 }
 jacoco {
-    toolVersion = "0.7.+"
+    toolVersion = "0.8.5"
     // reportsDir = file("$buildDir/reports/jacoco")
 }
 

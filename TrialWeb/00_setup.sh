@@ -1,5 +1,5 @@
 #!/bin/bash
 
-gradle clean
-gradle copyDependencies
+./gradlew clean
+./gradlew copyDependencies
 cp build/dependencies/*.jar WebContent/WEB-INF/lib/
