@@ -1,0 +1,10 @@
+FROM centos:7
+
+# Set root password
+RUN echo "root:password" | chpasswd
+
+# install for SSL and keytool
+RUN yum -y install openssl java-11
+
+# exec.
+CMD ["/sbin/init"]

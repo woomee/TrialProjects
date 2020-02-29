@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+  centos7:
+    build:
+      context: .
+      dockerfile: Dockerfile_CentOS7
+    ports:
+      - "22000:22"
+    volumes:
+      - .:/mnt/host
+    working_dir: /mnt/host
+    entrypoint: ./entrypoint.sh
+
+
+        
+        
