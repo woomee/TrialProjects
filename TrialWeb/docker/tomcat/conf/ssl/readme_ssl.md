@@ -58,3 +58,17 @@ openssl x509 -text -in mycert1.cer
     </SSLHostConfig>
     </Connector>
     ```
+
+# Windowsへの設定
+1. myCA.cerを右クリックして「証明書のインストール」
+2. 保存場所を 現在のユーザ/ローカルコンピュータを洗濯
+3. 「証明書をすべて次のストアに配置する」を選び、「参照」->「信頼されたルート証明機関」
+
+# iPhone(iOS13)の場合
+1. myCA.cerをダウンロードできる位置に置く
+    - WebContent/vr 以下など
+2. SafariにてmyCA.cerにアクセスするとダウンロードされる
+3. 「設定」にて「プロファイルがダウンロードされました」が出ているので選択して「インストール」
+    - パスコードを求められたら入力
+4. 「設定」->「一般」->「情報」->「証明書信頼設定」よりインストールした証明書をONにする
+- (参考): https://www.ibm.com/support/knowledgecenter/ja/SSHS8R_7.0.0/com.ibm.worklight.installconfig.doc/admin/t_installing_root_CA_iOS.html
