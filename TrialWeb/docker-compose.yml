@@ -5,7 +5,7 @@ services:
     image: "tomcat:9.0.30-jdk11-adoptopenjdk-openj9"
 #    image: "tomcat:9.0.30-jdk11-openjdk"
     ports:
-        - "8000:8000"
+        - "18000:8000"
         - "18080:8080"
         - "18443:8443"
     volumes: 
