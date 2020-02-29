@@ -1,3 +1,5 @@
+.yarnrc
+yarn.lock
 .gradle
 build
 WebContent/lib
@@ -5,3 +7,7 @@ WebContent/lib_node
 WebContent/WEB-INF/classes
 WebContent/WEB-INF/lib
 WebContent/META-INF
+docker/tomcat/conf/ssl/bak*
+docker/tomcat/conf/ssl/trial_*
+docker/tomcat/conf/ssl/*.key
+docker/tomcat/conf/ssl/*.cer
