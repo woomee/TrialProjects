@@ -1,0 +1,531 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+<title>vrGameBase</title>
+
+<!-- css -->
+<style>
+
+/***************************
+ * body
+ ***************************/
+
+body {
+	margin:0px;
+	padding:0px;
+}
+
+
+/***************************
+ * canvas
+ ***************************/
+
+.canvas_wrap {
+	position:relative;
+	width:100%;
+	margin:0px;
+	padding:0px;
+	overflow:hidden;
+	background-color:#000;
+}
+
+.canvas_box {
+	position:fixed;
+	width:100%;
+	height:100%;
+	margin:0px;
+	padding:0px;
+	top:0;
+	left:0;
+	overflow:hidden;
+	background-color:#000;
+}
+
+#canvas_main {
+	width:100%;
+	height:100%;
+	margin:0px;
+	padding:0px;
+}
+
+
+/***************************
+ * canvas_start
+ ***************************/
+
+.canvas_start {
+	position:absolute;
+	top:0;
+	left:0;
+	right:0;
+	bottom:0;
+	margin:auto;
+	background-color:#0066cc;
+	opacity:0.5;
+	display:none;
+}
+
+.canvas_start .inner {
+	position:absolute;
+	top:0;
+	left:0;
+	right:0;
+	bottom:0;
+	margin:auto;
+	display:table;
+	width:100%;
+	height:100vh;
+}
+
+.canvas_start .inner p {
+	display:table-cell;
+	vertical-align:middle;
+	text-align:center;
+	color:#ffffff;
+}
+
+
+/***************************
+ * canvas_loader
+ ***************************/
+
+.canvas_loader {
+	position:absolute;
+	top:0;
+	left:0;
+	right:0;
+	bottom:0;
+	margin:auto;
+	background-color:#00cc66;
+}
+
+.canvas_loader .inner {
+	position:absolute;
+	top:0;
+	left:0;
+	right:0;
+	bottom:0;
+	margin:auto;
+	display:table;
+	width:100%;
+	height:100vh;
+}
+
+.canvas_loader .inner p {
+	display:table-cell;
+	vertical-align:middle;
+	text-align:center;
+	color:#ffffff;
+}
+
+
+/***************************
+ * canvas_ctrl
+ ***************************/
+
+.canvas_ctrl {
+	position:absolute;
+	bottom:0;
+	left:0;
+	margin:auto;
+	padding:15px;
+	display:none;
+}
+
+#btn_reset {
+	position:fixed;
+	top:15px;
+	left:15px;
+	cursor:pointer;
+}
+
+</style>
+
+<!-- js -->
+<script src="https://tknc.jp/wk/sysmng/20190305/js/jquery-1.11.2.min.js"></script>
+<script src="https://tknc.jp/wk/sysmng/20190305/js/three/three.min.js"></script>
+<script src="https://tknc.jp/wk/sysmng/20190305/js/three/DeviceOrientationControls.js"></script>
+<script src="https://tknc.jp/wk/sysmng/20190305/js/three/OrbitControls.js"></script>
+<script src="https://tknc.jp/wk/sysmng/20190305/js/three/Detector.js"></script>
+<script src="https://tknc.jp/wk/sysmng/20190305/js/three/ColladaLoader.js"></script>
+
+<!--
+<script src="vrGameBase.js"></script>
+-->
+<script>
+;(function($){
+
+//vrbk
+jQuery.fn.vrGameBase=function(optUser){
+
+	//options
+	const optDef={
+		enableGyro : true,
+		camera     : {
+			fov  : 45,
+			near : 1,
+			far  : 20000
+		}
+	};
+	const opt=$.extend(optDef,optUser);
+
+	//canvas
+	const myCanvas=$(this);
+	var cv=new Canvas();
+	function Canvas(){
+		this._id     =myCanvas.attr("id");
+		this._box    =myCanvas.closest(".canvas_box");
+		this._loader =myCanvas.closest(".canvas_box").find(".canvas_loader");
+		this._start  =myCanvas.closest(".canvas_box").find(".canvas_start");
+		this._ctrl   =myCanvas.closest(".canvas_box").find(".canvas_ctrl");
+
+		this._w      =this._box.width();
+		this._h      =this._box.height();
+	}
+	myCanvas.attr({
+		'width'  : cv._w,
+		'height' : cv._h
+	});
+
+	//ジャイロセンサー確認
+	var isGyro=false;
+	if((opt.enableGyro)&&(window.DeviceOrientationEvent)&&('ontouchstart' in window)){
+		isGyro=true;
+	}
+
+	//three.js
+	var renderer;
+	var scene;
+	var camera;
+	var controls;
+	var mixer;
+	var clock;
+
+	var camera_height=200;
+
+	//DeviceOrientationControls用カメラ
+	var camera_doc;
+	var camera_defx;
+	var camera_defy;
+	var camera_defz;
+
+	//group
+	var grpWorld;
+	var grpBase;
+	var grpHorse;
+
+	//loader
+	var loader={};
+
+	//timer
+	var timerLoading;
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////
+	// Canvas
+	///////////////////////////////////////////////////////////////////////////////////////////
+
+	setCanvas();
+	function setCanvas(){
+		if(!Detector.webgl){Detector.addGetWebGLMessage();}
+
+		renderer=new THREE.WebGLRenderer({
+			canvas    : document.querySelector('#'+cv._id),
+			antialias : true,
+			alpha     : true
+		});
+
+		renderer.setPixelRatio(window.devicePixelRatio);
+		renderer.setSize(cv._w,cv._h);
+
+		scene=new THREE.Scene();
+		grpWorld=new THREE.Group();
+		grpBase=new THREE.Group();
+		grpHorse=new THREE.Group();
+
+		clock=new THREE.Clock();
+
+		//スマホなどジャイロセンサーが有効なときはカメラを2台使う
+		if(isGyro){
+			//通常カメラ
+			camera=new THREE.PerspectiveCamera(opt.camera.fov,cv._w/cv._h,opt.camera.near,opt.camera.far);
+			camera.position.set(0,0,0.01);
+			camera.lookAt(new THREE.Vector3(0,0,0));
+
+			//ジャイロセンサーによる角度を取得する目的だけのカメラ
+			camera_doc=new THREE.PerspectiveCamera(opt.camera.fov,cv._w/cv._h,opt.camera.near,opt.camera.far);
+			camera_doc.position.set(0,0,0.01);
+			camera_doc.lookAt(new THREE.Vector3(0,0,0));
+
+			controls=new THREE.DeviceOrientationControls(camera_doc);
+			controls.connect();
+
+			controls.update();
+			camera_defx=camera_doc.rotation.x;
+			camera_defy=camera_doc.rotation.y;
+			camera_defz=camera_doc.rotation.z;
+
+		//PCなどジャイロセンサーがない場合はOrbitControlsのみ
+		}else{
+			camera=new THREE.PerspectiveCamera(opt.camera.fov,cv._w/cv._h,opt.camera.near,opt.camera.far);
+			camera.position.set(0,0,0.01);
+			camera.lookAt(new THREE.Vector3(0,0,0));
+			controls=new THREE.OrbitControls(camera,renderer.domElement);
+
+			controls.autoRotate    =false;
+			controls.enableRotate  =true;
+			controls.rotateSpeed   =-0.05;
+			controls.enableDamping =true;
+			controls.dampingFactor =0.1;
+			controls.enableZoom    =false;
+			controls.enablePan     =false;
+		}
+
+
+		///////////////////////////////////////////////////////////////////////
+		// ↓テスト用3Dオブジェクト配置
+		///////////////////////////////////////////////////////////////////////
+
+		//world
+// CROSのためダウンロード            
+//			const srcWorld="https://tknc.jp/wk/sysmng/20190305/src/texture/world.jpg";
+		const srcWorld="world.jpg";
+		var gmWorld=new THREE.SphereBufferGeometry(10000,60,40);
+		gmWorld.scale(-1,1,1);
+		var mtrWorld;
+
+		loader[srcWorld]=false;
+		var textureWorld=new THREE.TextureLoader().load(srcWorld,function(){
+			loader[srcWorld]=true;
+		});
+		mtrWorld=new THREE.MeshBasicMaterial({
+			map : textureWorld
+		});
+		textureWorld.minFilter=textureWorld.magFilter=THREE.LinearFilter;
+		textureWorld.mapping=THREE.UVMapping;
+
+		var world=new THREE.Mesh(gmWorld,mtrWorld);
+		world.rotation.y=(180*Math.PI/180)*-1;
+		grpWorld.add(world);
+
+		//light
+		var light=new THREE.AmbientLight(0xffffff);
+		light.castShadow=true;
+		grpWorld.add(light);
+		var pointLight=new THREE.PointLight(0xFFFFFF,1.5,1000);
+		pointLight.position.set(0,400,0);
+		pointLight.castShadow=true;
+		grpWorld.add(pointLight);
+
+		//horse
+// CROSのためエラー            
+//			const srcHorse="https://tknc.jp/wk/sysmng/20190305/src/dae/uma.dae";
+		const srcHorse="./uma.dae";
+		loader[srcHorse]=false;
+		var loaderHorse=new THREE.ColladaLoader();
+		loaderHorse.options.convertUpAxis=true;
+		loaderHorse.load(srcHorse,function(collada){
+			var horse=collada.scene;
+
+			horse.traverse(function(node){
+				if(node.isSkinnedMesh){
+					node.frustumCulled=false;
+				}
+			});
+
+			mixer=new THREE.AnimationMixer(horse);
+			var action=mixer.clipAction(collada.animations[0]).play();
+
+			horse.scale.x=horse.scale.y=horse.scale.z=100;
+			horse.rotation.z=(180*Math.PI/180);
+
+			horse.position.set(0,0,0);
+			horse.updateMatrix();
+			grpHorse.add(horse);
+			grpHorse.rotation.y=0;
+
+			grpHorse.position.set(0,0,-800);
+			grpBase.add(grpHorse);
+
+			loader[srcHorse]=true;
+		});
+
+		var wky=camera_height*-1;
+		grpBase.position.set(0,wky,0);
+		grpWorld.add(grpBase);
+		scene.add(grpWorld);
+
+		///////////////////////////////////////////////////////////////////////
+
+
+		//checkLoading
+		var check_sec=500;
+		var check_cnt=0;
+		var check_limit=30000;
+
+		checkLoading();
+		function checkLoading(){
+			var flag_loading=false;
+			Object.keys(loader).forEach(function(key){
+				if(!loader[key]){
+					flag_loading=true;
+				}
+			},loader);
+
+			//読み込み中
+			if(flag_loading){
+				timerLoading=setTimeout(function(){
+					check_cnt+=check_sec;
+					if(check_cnt<check_limit){
+						checkLoading();
+					}else{
+						//エラー処理など
+						alert("読み込みに失敗しました。");
+					}
+				},check_sec);
+
+			//読み込み完了
+			}else{
+				clearTimeout(timerLoading);
+				runAnimate();
+
+				gameReset();
+			}
+		}
+
+		//runAnimate
+		function runAnimate(){
+			var delta=clock.getDelta();
+			if(mixer!==undefined){
+				mixer.update(delta);
+			}
+
+			controls.update();
+
+			if(isGyro){
+				var camera_nowx=camera_doc.rotation.x;
+				var camera_nowy=camera_doc.rotation.y;
+				var camera_nowz=camera_doc.rotation.z;
+
+				//Y方向のみ制御する場合
+				camera.rotation.x=camera_nowx;
+				camera.rotation.y=(camera_defy-camera_nowy)*-1;
+				camera.rotation.z=camera_nowz;
+
+				//全方向参照する場合
+				//camera.rotation.x=(camera_defx-camera_nowx)*-1;
+				//camera.rotation.y=(camera_defy-camera_nowy)*-1;
+				//camera.rotation.z=(camera_defz-camera_nowz)*-1;
+			}
+
+			grpHorse.rotation.y+=0.05;
+
+			renderer.render(scene,camera);
+			requestAnimationFrame(runAnimate);
+		}
+	}
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////
+	// Window Resize
+	///////////////////////////////////////////////////////////////////////////////////////////
+
+	var timerResize=false;
+	$(window).on("resize",function(){
+		if(timerResize!==false){
+			clearTimeout(timerResize);
+		}
+		timerResize=setTimeout(function(){
+			resizeCanvas();
+		},500);
+	});
+
+	function resizeCanvas(){
+		cv._w=cv._box.width();
+		cv._h=cv._box.height();
+		myCanvas.attr({
+			'width'  : cv._w,
+			'height' : cv._h
+		});
+
+		renderer.setPixelRatio(window.devicePixelRatio);
+		renderer.setSize(cv._w,cv._h);
+		camera.aspect=cv._w/cv._h;
+		camera.updateProjectionMatrix();
+	}
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////
+	// 操作イベント
+	///////////////////////////////////////////////////////////////////////////////////////////
+
+	$("#btn_reset").on("click",function(){
+		gameReset();
+	});
+
+	cv._start.on("click",function(){
+		cv._start.hide();
+		cv._ctrl.show();
+
+		//START画面を挟みユーザのアクションを得る
+		//スマホなどでaudioの読み込みなど、アクションが必要な処理はここで行う
+	});
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////
+	// リセット処理
+	///////////////////////////////////////////////////////////////////////////////////////////
+
+	function gameReset(){
+		clearTimeout(timerLoading);
+		grpHorse.rotation.y=0;
+
+		cv._start.show();
+		cv._loader.hide();
+		cv._ctrl.hide();
+
+		if(isGyro){
+			controls.update();
+			camera_defx=camera_doc.rotation.x;
+			camera_defy=camera_doc.rotation.y;
+			camera_defz=camera_doc.rotation.z;
+		}
+		camera.position.set(0,0,0.01);
+		camera.lookAt(new THREE.Vector3(0,0,0));
+	}
+
+};
+
+})(jQuery);
+
+
+jQuery(function(){
+	$(window).on("load",function(){
+		$("#canvas_main").vrGameBase();
+	});
+});
+</script>
+
+</head>
+<body>
+<div class="canvas_wrap">
+  <div class="canvas_box">
+    <canvas id="canvas_main"></canvas>
+
+    <div class="canvas_start">
+      <div class="inner"><p>TOUCH START!!</p></div>
+    </div>
+
+    <div class="canvas_loader">
+      <div class="inner"><p>Loading ...</p></div>
+    </div>
+
+    <div class="canvas_ctrl">
+      <button class="btn_ctrl" id="btn_reset">リセット</button>
+    </div>
+  </div>
+  <div id="scroll_area" style="height:300%;"></div>
+</div>
+</body>
+</html>
