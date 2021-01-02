@@ -16,4 +16,7 @@ services:
     volumes:
       - ".:/home/node/app"
     working_dir: /home/node/app/src/main/web
+    # user: "1000:1000"
+    user: "${USER_ID}:${GROUP_ID}"
+
     tty: true
