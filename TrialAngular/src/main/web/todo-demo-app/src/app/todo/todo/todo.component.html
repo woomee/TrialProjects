@@ -1,0 +1,56 @@
+<ng-container *ngIf="user$ | async as user">
+    <form class="todoForm" [formGroup]="form" (ngSubmit)="createTodo(user!.uid)">
+      <mat-form-field hintLabel="最大文字数">
+        <mat-label>TODO追加</mat-label>
+        <input
+          matInput
+          type="text"
+          formControlName="name"
+          autocomplete="off"
+          maxlength="15"
+          #input
+        />
+        <!-- バリデーションエラー -->
+        <mat-error *ngIf="form.controls.name.hasError('maxlength')">
+          文字数オーバー
+        </mat-error>
+        <mat-error *ngIf="form.controls.name.hasError('required')">
+          入力してください
+        </mat-error>
+        <!-- <mat-hint align="end"> {{ input.value?.length || 0 }}/15 </mat-hint> -->
+        <mat-hint align="end"> {{ input.value?.length || 0 }}/{{input.maxLength}}</mat-hint>
+      </mat-form-field>
+      <button mat-icon-button [disabled]="!form.valid">
+        <mat-icon>send</mat-icon>
+      </button>
+    </form>
+  </ng-container>
+  
+  <!-- <ng-container *ngFor="let todo of todos$ | async">
+    <div>
+      {{ todo.name }}
+    </div>
+  </ng-container> -->
+  <div class="todolist" cdkDropListGroup>
+    <ng-container *ngFor="let list of lists">
+      <div class="todolist__container mat-elevation-z2">
+        <div class="todolist__label">{{ list }}</div>
+        <div
+          id="{{ list }}"
+          class="todolist__box"
+          cdkDropList
+          [cdkDropListData]="filterTodo(list, (todos$ | async)!)"
+          (cdkDropListDropped)="drop($event)"
+        >
+          <app-todo-item
+            class="todolist__item mat-elevation-z1"
+            *ngFor="let todo of filterTodo(list, (todos$ | async)!)"
+            cdkDrag
+            [cdkDragData]="todo"
+            [todo]="todo"
+            (deleteTodo)="deleteTodo($event)"
+          ></app-todo-item>
+        </div>
+      </div>
+    </ng-container>
+  </div>

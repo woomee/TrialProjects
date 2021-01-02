@@ -1,0 +1,23 @@
+<!-- <mat-toolbar>
+  <button mat-button>TODO</button>
+  <span class="spacer"></span>
+  <button mat-raised-button>ログイン</button>
+</mat-toolbar> -->
+
+<mat-toolbar>
+  <button mat-button>TODO</button>
+  <span class="spacer"></span>
+  <ng-container *ngIf="user$ | async as user; else showLogin">
+    <button mat-raised-button (click)="logout()">
+      ログアウト
+      <img src="{{ user.photoURL }}" alt="" width="30px" />
+    </button>
+  </ng-container>
+  <ng-template #showLogin>
+    <button mat-raised-button (click)="login()">ログイン</button>
+  </ng-template>
+</mat-toolbar>
+
+<ng-container *ngIf="user$ | async as user">
+  <router-outlet></router-outlet>
+</ng-container>

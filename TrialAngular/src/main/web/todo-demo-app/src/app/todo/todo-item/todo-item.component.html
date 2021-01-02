@@ -1,0 +1,8 @@
+<ng-container *ngIf="todo">
+    <div>
+      {{ todo.name }}
+      <button (click)="remove(todo.id)" mat-icon-button>
+        <mat-icon>clear</mat-icon>
+      </button>
+    </div>
+</ng-container>
