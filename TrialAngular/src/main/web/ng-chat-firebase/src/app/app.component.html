@@ -1,0 +1,38 @@
+<div class="page">
+  <section class="card">
+    <div class="card-header">
+      NgChat
+    </div>
+    <div class="card-body">
+      <ng-container *ngFor="let comment of comments">
+        <div class="media">
+          <div class="media-left" *ngIf="comment.user.uid !== current_user.uid">
+            <a href="#" class="icon-rounded">{{comment.initial}}</a>
+          </div>
+          <div class="media-body">
+            <h4 class="media-heading">{{comment.user.name}} Date:2016/09/01</h4>
+            <div>{{comment.content}}</div>
+          </div>
+          <div class="media-right" *ngIf="comment.user.uid === current_user.uid">
+            <a href="#" class="icon-rounded">{{comment.initial}}</a>
+          </div>
+        </div>
+        <hr>
+      </ng-container>
+    </div>
+  </section>
+
+  <section>
+    <form class="chart-form" (submit)="addComment(content)">
+      <div class="input-group">
+        <input type="text" class="form-control"
+          name="comment"
+          [(ngModel)]="content"
+          placeholder="{{title}}" />
+        <div class="input-group-append">
+          <button class="btn btn-info" type="submit">SEND</button>
+        </div>
+      </div>
+    </form>
+  </section>
+</div>
