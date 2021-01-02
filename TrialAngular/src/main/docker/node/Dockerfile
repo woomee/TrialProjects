@@ -9,5 +9,7 @@ RUN npm install -g @angular/cli \
  # コードフォーマッタ prettierを追加
  && yarn add prettier \
  # FireBase向けのcliをインストール
- && npm install -g firebase-tools
+ && npm install -g firebase-tools \
+ # 日付ライブラリをインストール
+ && yarn add moment
 

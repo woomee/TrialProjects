@@ -10,7 +10,7 @@
             <a href="#" class="icon-rounded">{{comment.initial}}</a>
           </div>
           <div class="media-body">
-            <h4 class="media-heading">{{comment.user.name}} Date:2016/09/01</h4>
+            <h4 class="media-heading">{{comment.user.name}}　Date:{{comment.date | chatDate}}</h4>
             <div>{{comment.content}}</div>
           </div>
           <div class="media-right" *ngIf="comment.user.uid === current_user.uid">
