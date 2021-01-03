@@ -34,8 +34,9 @@ export class AppComponent {
         .pipe(
           map(actions => actions.map(action => {
             const data = action.payload.doc.data() as Comment;
+            const key = action.payload.doc.id; // 追加
             const commentData = new Comment(data.user, data.content);
-            commentData.setData(data.date);
+            commentData.setData(data.date, key); // 更新
             return commentData;
           }))
         )
@@ -49,4 +50,41 @@ export class AppComponent {
       this.content = ''; 
     }
   }
+
+  // 編集フィールドの切り替え
+  toggleEditComment(comment: Comment) { // 追加
+    comment.editFlag = (!comment.editFlag);
+  }
+
+  // コメントを更新する
+  saveEditComment(comment: Comment) { // 追加
+    this.db
+      .collection('comments')
+      .doc(comment.key)
+      .update({
+        content: comment.content,
+        date: comment.date
+      })
+      .then(() => {
+        alert('コメントを更新しました');
+        comment.editFlag = false;
+      });
+  }
+
+  // コメントをリセットする
+  resetEditComment(comment: Comment) { // 追加
+    comment.content = '';
+  }
+
+  // コメントを削除する
+  deleteComment(comment: Comment) { // 追加
+    this.db
+      .collection('comments')
+      .doc(comment.key)
+      .delete()
+      .then(() => {
+        alert('コメントを削除しました');
+      });
+  }
+
 }

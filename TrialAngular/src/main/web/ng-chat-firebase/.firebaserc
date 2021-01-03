@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "ng-chat-firebase"
+  },
+  "targets": {
+    "ng-chat-firebase": {
+      "hosting": {
+        "ng-chat-firebase": [
+          "ng-chat-firebase"
+        ]
+      }
+    }
+  }
+}

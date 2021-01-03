@@ -22,6 +22,8 @@ export class Comment { // Commentの定義を変更
     initial: string;
     content: string;
     date: number;
+    key?: string; // 追加
+    editFlag?: boolean; // 追加
   
     constructor(user: User, content: string) {
       this.user = user;
@@ -35,9 +37,11 @@ export class Comment { // Commentの定義を変更
         return Object.assign({}, this);
     }
 
-    // 追加時点の日付を反映
-    setData(date: number): Comment { // 追加
+    // 追加時点の日付を反映し、更新フラグを付ける
+    setData(date: number, key: string): Comment { // 追加
         this.date = date;
+        this.key = key;
+        this.editFlag = false;
         return this;
     }    
  }
