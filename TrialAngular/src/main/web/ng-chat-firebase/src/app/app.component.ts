@@ -2,17 +2,12 @@ import { Component } from '@angular/core';
 import { Comment, User } from './class/chat';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators'; // 追加
 
 const CURRENT_USER: User = new User(1, 'Tanaka Jiro'); // 自分のUser情報を追加
 const ANOTHER_USER: User = new User(2, 'Suzuki Taro'); // 相手のUser情報を追加
 
-const COMMENTS: Comment[] =[
-  new Comment(ANOTHER_USER, 'Suzukiの１つ目のコメントです。'),
-  new Comment(ANOTHER_USER, 'Suzukiの2つ目のコメントです。'),
-  new Comment(CURRENT_USER, 'Tanakaの１つ目のコメントです。'),
-  new Comment(ANOTHER_USER, 'Suzukiの3つ目のコメントです。'),
-  new Comment(CURRENT_USER, 'Tanakaの2つ目のコメントです。')
-];
+
 
 @Component({
   selector: 'app-root',
@@ -23,23 +18,27 @@ const COMMENTS: Comment[] =[
 export class AppComponent {
   title = 'ng-chat-firebase';
 
-  item: Observable<Comment | undefined>; // 追加
   public content = '';
-  public comments = COMMENTS;
+  public comments: Observable<Comment[]>;
   public current_user = CURRENT_USER; // 追加
 
   // DI（依存性注入する機能を指定）
   constructor(private db: AngularFirestore) {
-    // NG
-    // this.item = db
-    //   .collection('comments')
-    //   .doc<Comment>('item')
-    //   .valueChanges();
 
-    this.item = db
-      .collection<Comment>('comments')
-      .doc('item')
-      .valueChanges();
+    this.comments = db
+        .collection<Comment>('comments', ref => {
+          // 日時の昇順で取得
+          return ref.orderBy('date', 'asc');
+        })
+        .snapshotChanges()
+        .pipe(
+          map(actions => actions.map(action => {
+            const data = action.payload.doc.data() as Comment;
+            const commentData = new Comment(data.user, data.content);
+            commentData.setData(data.date);
+            return commentData;
+          }))
+        )
   }
 
   addComment(comment: string) {

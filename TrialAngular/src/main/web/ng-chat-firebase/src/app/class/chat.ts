@@ -34,4 +34,10 @@ export class Comment { // Commentの定義を変更
         this.user = this.user.deserialize();
         return Object.assign({}, this);
     }
+
+    // 追加時点の日付を反映
+    setData(date: number): Comment { // 追加
+        this.date = date;
+        return this;
+    }    
  }
