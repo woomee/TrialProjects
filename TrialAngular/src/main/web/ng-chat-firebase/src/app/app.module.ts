@@ -14,13 +14,16 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ChatComponent } from './chat/chat.component';
 import { SharedModule } from './shared/shared.module';
 import { HeaderComponent } from './header/header.component';
+import { PageNotFoundComponent } from './error/page-not-found/page-not-found.component';
+import { RouterModule } from '@angular/router';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     ChatComponent,
-    HeaderComponent
+    HeaderComponent,
+    PageNotFoundComponent
   ],
   imports: [
     BrowserModule,
@@ -28,8 +31,9 @@ import { HeaderComponent } from './header/header.component';
     SharedModule,
     NgbModule,
     AngularFireModule.initializeApp(environment.firebase),
-    AngularFirestoreModule,  // 追加
-    AngularFireAuthModule  // 追加
+    AngularFirestoreModule,
+    AngularFireAuthModule,
+    RouterModule
   ],
   providers: [],
   bootstrap: [AppComponent]

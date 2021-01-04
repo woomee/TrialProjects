@@ -3,6 +3,18 @@ import * as moment from 'moment';
 export class Chat {
 }
 
+export class Session { // 追加
+    login: boolean;
+  
+    constructor() {
+      this.login = false;
+    }
+    reset(): Session { // 追加
+        this.login = false;
+        return this;
+    }
+}
+
 export class User { // Userの定義を追加
     uid: number;
     name: string;
