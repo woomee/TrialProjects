@@ -33,12 +33,14 @@ export class ChatComponent implements OnInit {
             const commentData = new Comment(data.user, data.content);
             commentData.setData(data.date, key); // 更新
             return commentData;
+
+            // return action.payload.doc.data();
           }))
         )
    }
 
   ngOnInit(): void {
-
+    console.log("chat.component");
   }
 
   addComment(comment: string) {
@@ -73,6 +75,11 @@ export class ChatComponent implements OnInit {
   // コメントをリセットする
   resetEditComment(comment: Comment) { // 追加
     comment.content = '';
+  }
+
+  // コメント編集をやめる
+  cancelEditComment(comment: Comment) { // 追加
+    this.toggleEditComment(comment)
   }
 
   // コメントを削除する

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
+import { Password } from 'src/app/class/chat';
 import { SessionService } from 'src/app/service/session.service';
 
 @Component({
@@ -19,6 +20,7 @@ export class LoginComponent implements OnInit {
   public loginSubject: Subject<number> = new Subject();  // 変更
   public loginState = this.loginSubject.asObservable();  // 追加
   public count = 0;  // 追加
+  public account = new Password();
 
 
   constructor(private sessionService: SessionService) { }
@@ -34,7 +36,8 @@ export class LoginComponent implements OnInit {
   }
 
   submitLogin() { // 追加
-    this.sessionService.login();
+    // e.preventDefault();
+    this.sessionService.login(this.account);
   }
 
   clickNext() { // 追加

@@ -57,3 +57,21 @@ export class Comment { // Commentの定義を変更
         return this;
     }    
  }
+
+ export class Password { // 追加
+    email: string;
+    password: string;
+    passwordConfirmation: string;
+  
+    constructor() {
+      this.email = '';
+      this.password = '';
+      this.passwordConfirmation = '';
+    }
+  
+    reset(): void {
+      this.email = '';
+      this.password = '';
+      this.passwordConfirmation = '';    
+    }
+}
