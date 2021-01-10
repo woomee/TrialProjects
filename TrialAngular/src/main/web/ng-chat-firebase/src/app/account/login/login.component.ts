@@ -37,8 +37,14 @@ export class LoginComponent implements OnInit {
 
   submitLogin() { // 追加
     // e.preventDefault();
-    this.sessionService.login(this.account);
-  }
+    if (this.account.email != null && this.account.email.length > 0) {
+      this.sessionService.login(this.account);
+    }
+    else {
+      console.log("email is not set.")
+    }
+  }    
+
 
   clickNext() { // 追加
     this.count++;

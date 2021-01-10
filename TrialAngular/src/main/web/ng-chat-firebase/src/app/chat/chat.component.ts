@@ -3,9 +3,10 @@ import { Comment, User } from '../class/chat';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators'; // 追加
+import { SessionService } from '../service/session.service';
 
-const CURRENT_USER: User = new User(1, 'Tanaka Jiro'); // 自分のUser情報を追加
-const ANOTHER_USER: User = new User(2, 'Suzuki Taro'); // 相手のUser情報を追加
+const CURRENT_USER: User = new User('1', 'Tanaka Jiro'); // 自分のUser情報を追加
+const ANOTHER_USER: User = new User('2', 'Suzuki Taro'); // 相手のUser情報を追加
 
 @Component({
   selector: 'app-chat',
@@ -17,9 +18,18 @@ const ANOTHER_USER: User = new User(2, 'Suzuki Taro'); // 相手のUser情報を
 export class ChatComponent implements OnInit {
   public content = '';
   public comments: Observable<Comment[]>;
-  public current_user = CURRENT_USER; // 追加
+  public current_user = CURRENT_USER;
 
-  constructor(private db: AngularFirestore) {
+  constructor(
+    private db: AngularFirestore,
+    private session: SessionService
+  ) {
+    this.session
+      .sessionState
+      .subscribe(data => {
+        this.current_user = data.user;
+      })
+
     this.comments = db
         .collection<Comment>('comments', ref => {
           // 日時の昇順で取得
@@ -46,7 +56,7 @@ export class ChatComponent implements OnInit {
   addComment(comment: string) {
     if (comment) {
       // this.comments.push(new Comment(this.current_user, comment));
-      this.db.collection('comments')
+      this.db.collection<Comment>('comments')
              .add(new Comment(this.current_user, comment).deserialize());
       this.content = ''; 
     }
