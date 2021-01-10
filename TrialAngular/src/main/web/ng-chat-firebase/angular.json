@@ -131,5 +131,8 @@
       }
     }
   },
-  "defaultProject": "ng-chat-firebase"
+  "defaultProject": "ng-chat-firebase",
+  "cli": {
+    "defaultCollection": "@ngrx/schematics"
+  }
 }
