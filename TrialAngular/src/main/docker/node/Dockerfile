@@ -1,15 +1,17 @@
-FROM node:15.5.0-alpine3.12
+# Firebase FunctionはNode.jsは10 or 12
+FROM node:12.20.1-alpine3.12
 
 # Angularとfirebaseのcliをインストール
-RUN npm install -g @angular/cli \
+RUN \
  # ng newするとgitでエラーになるため追加
- && apk add git \
+ apk add git \
  # pushd/popdなどが使えないためbashを追加
  && apk add bash \
- # コードフォーマッタ prettierを追加
- && yarn add prettier \
+ # Angularのクライアント
+ && npm install -g @angular/cli@11.0.6 \
  # FireBase向けのcliをインストール
- && npm install -g firebase-tools \
- # 日付ライブラリをインストール
- && yarn add moment
-
+ && npm install -g firebase-tools@9.1.1 \
+ # Firebaseのエミュレータで必要なjava
+ && apk add openjdk11-jre-headless \
+ # Firebase のエミュレータ
+ && firebase setup:emulators:firestore 
