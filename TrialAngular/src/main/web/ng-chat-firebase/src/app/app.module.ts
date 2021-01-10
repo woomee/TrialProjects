@@ -16,12 +16,13 @@ import { SharedModule } from './shared/shared.module';
 import { HeaderComponent } from './header/header.component';
 import { PageNotFoundComponent } from './error/page-not-found/page-not-found.component';
 import { RouterModule } from '@angular/router';
+import { AppStoreModule } from './app-store/app-store.module';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    ChatComponent,
+    // ChatComponent,
     HeaderComponent,
     PageNotFoundComponent
   ],
@@ -33,7 +34,8 @@ import { RouterModule } from '@angular/router';
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule,
     AngularFireAuthModule,
-    RouterModule
+    RouterModule,
+    AppStoreModule
   ],
   providers: [],
   bootstrap: [AppComponent]

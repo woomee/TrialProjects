@@ -8,7 +8,10 @@ import { LoginGuard } from './guard/login.guard';
 
 const routes: Routes = [
   { path: 'test', redirectTo: '', pathMatch: 'full'}, // 追加
-  { path: '', component: ChatComponent, canActivate: [AuthGuard] },
+  { path: '', 
+    // component: ChatComponent,
+    loadChildren: () => import('./chat/chat.module').then(m => m.ChatModule),
+    canActivate: [AuthGuard] },
   { path: 'account',
     loadChildren: () => import ('./account/account.module').then(m => m.AccountModule),
     canActivate: [LoginGuard] },

@@ -21,9 +21,9 @@ export class Session { // 追加
   login: boolean;
   user: User;
 
-  constructor() {
-    this.login = false;
-    this.user = new User();
+  constructor(init?: User) {
+    this.login = (!!init);
+    this.user = (init) ? new User(init.uid, init.name) : new User();
   }
   reset(): Session { // 追加
       this.login = false;
@@ -36,8 +36,10 @@ export class Comment { // Commentの定義を変更
     initial?: string;
     content: string;
     date: number;
-    key?: string; // 追加
-    editFlag?: boolean; // 追加
+    // Redux化でidに変更
+    // key?: string;
+    id?: string; 
+    editFlag?: boolean;
   
     constructor(user: User, content: string) {
       this.user = user;
@@ -52,9 +54,9 @@ export class Comment { // Commentの定義を変更
     }
 
     // 追加時点の日付を反映し、更新フラグを付ける
-    setData(date: number, key: string): Comment { // 追加
+    setData(date: number, key: string): Comment {
         this.date = date;
-        this.key = key;
+        this.id = key;
         this.editFlag = false;
         return this;
     }    
