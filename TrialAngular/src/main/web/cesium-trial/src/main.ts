@@ -10,3 +10,7 @@ if (environment.production) {
 
 platformBrowserDynamic().bootstrapModule(AppModule)
   .catch(err => console.error(err));
+
+
+// tslint:disable-next-line: noImplicitAny
+window['CESIUM_BASE_URL'] = 'src/assets/cesium/';
