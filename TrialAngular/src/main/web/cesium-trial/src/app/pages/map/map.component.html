@@ -1,0 +1,9 @@
+<h1>Map Component</h1>
+<!-- <div appCesium initOption="cesiumInitOption"></div> -->
+<!-- <app-cesium [initOption]="cesiumInitOption"
+     (initOutputEvent)="onInitCesium($event)"
+</app-cesium> -->
+
+<app-cesium [initOption]="cesiumInitOption"
+     (initViewerEvent)="onInitViewer($event)" >
+</app-cesium>
