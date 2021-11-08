@@ -1,0 +1,2 @@
+include 'kajitool-web', 'kajitool-flyway', 'kajitool-dao'
+

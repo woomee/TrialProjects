@@ -1,0 +1,9 @@
+.gradle
+
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+
+kajitool-h2db/
