@@ -27,8 +27,9 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 
 	// Add Swagger UI
-	implementation 'io.springfox:springfox-swagger2:2.9.2'
-	implementation 'io.springfox:springfox-swagger-ui:2.9.2'
+	// implementation 'io.springfox:springfox-swagger2:2.9.2'
+	// implementation 'io.springfox:springfox-swagger-ui:2.9.2'
+	implementation 'io.springfox:springfox-boot-starter:3.0.0'
 
 	// YAVI Validation
 	implementation 'am.ik.yavi:yavi:0.2.2'
