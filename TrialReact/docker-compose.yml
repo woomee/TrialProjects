@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+  node:
+    build: 
+      context: ./src/main/docker/node
+      dockerfile: Dockerfile
+    ports:
+      # for Web app
+      - "3000:3000"
+      - "80:80"
+      - "8080:8080"
+      - "8888:8888"
+    volumes:
+      # /etc/group, passwdをReadOnlyでマウントして、
+      # マウント先のオーナーをホストと同じにする
+      - "/etc/group:/etc/group:ro"
+      - "/etc/passwd:/etc/passwd:ro"
+      # ホームディレクトリを割り当ててnpmの設定を保持する
+      - "./src/main/docker/node/home:${HOME}"
+      - "./src/main/docker/node/home:/root"
+      # アプリケーションはカレントをマウント
+      - ".:/home/node/app"
+    working_dir: /home/node/app/src/main/frontend
+    user: "1000:1000"
+    # user: "${USER_ID}:${GROUP_ID}"
+    tty: true #コンテナが勝手に終了しないための設定
+    stdin_open: true # 標準入出力とエラー出力をコンテナに結びつける設定
+    environment:
+      - CHOKIDAR_USEPOLLING=true # ホットリロードを行う設定
