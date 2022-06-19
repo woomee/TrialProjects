@@ -1,0 +1,13 @@
+spring:
+    datasource:
+        url: ${DB_URL:jdbc:oracle:thin:@//172.24.169.13:1521/ODB1}
+        username: ${DB_USER:oracle}
+        password: ${DB_PASSWORD:password}
+        driver-class-name: oracle.jdbc.OracleDriver
+    sql:
+        init:
+            mode: always
+    batch:
+        jdbc:
+            initialize-schema: always
+        
