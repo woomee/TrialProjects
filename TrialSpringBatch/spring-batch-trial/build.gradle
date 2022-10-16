@@ -1,0 +1,33 @@
+plugins {
+	id 'org.springframework.boot' version '2.6.2'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	// id 'org.springframework.boot' version '2.7.4'
+	// id 'io.spring.dependency-management' version '1.0.14.RELEASE'
+	id 'java'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-batch'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	runtimeOnly 'org.hsqldb:hsqldb'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.batch:spring-batch-test'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+// Spring Bootでのデバック指定
+// bootRun {
+//     jvmArgs '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=0.0.0.0:20000'
+// }
+
