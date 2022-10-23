@@ -19,12 +19,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.lang.NonNull;
 
 import com.example.demo.entity.Person;
 
 @Configuration
 @EnableBatchProcessing
-public class Job3_Chank {
+public class Job3_Chunk {
     @Autowired
     private JobBuilderFactory jobBuilderFactory;
     
@@ -69,7 +70,7 @@ public class Job3_Chank {
     public ItemProcessor<Person, Person> processor() {
         return new ItemProcessor<Person,Person>() {
             @Override
-            public Person process(final Person person) throws Exception {
+            public Person process(final @NonNull Person person) throws Exception {
                 final String firstName = person.getFirstName().toUpperCase();
                 final String lastName = person.getLastName().toUpperCase();
                 final Person transformedPerson = new Person(firstName, lastName);
@@ -81,7 +82,7 @@ public class Job3_Chank {
     @Bean
     public JdbcBatchItemWriter<Person> writer(DataSource dataSource) {
         return new JdbcBatchItemWriterBuilder<Person>()
-            .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
+            .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<Person>())
             .sql("INSERT INTO people (first_name, last_name) VALUES (:firstName, :lastName)")
             .dataSource(dataSource)
             .build();
