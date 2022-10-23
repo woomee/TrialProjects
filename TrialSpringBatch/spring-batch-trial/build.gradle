@@ -17,9 +17,13 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-batch'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	runtimeOnly 'org.hsqldb:hsqldb'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.batch:spring-batch-test'
+
+	// runtimeOnly 'org.hsqldb:hsqldb'
+	// runtimeOnly 'org.xerial:sqlite-jdbc:3.36.0.3'
+	runtimeOnly 'com.h2database:h2'
 }
 
 tasks.named('test') {
@@ -31,3 +35,15 @@ tasks.named('test') {
 //     jvmArgs '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=0.0.0.0:20000'
 // }
 
+/*
+ *  関連ファイルの取得のみ行う
+ *    build/dependencies以下にjarのみ取得する.
+ *    取得したjarをlibディレクトリに配備するのに利用したり、
+ *    依存しているファイルの確認に利用する。
+ */
+def dependenciesDistDir = "build/dependencies"
+task copyDependencies(type: Copy) {
+        delete dependenciesDistDir
+        from configurations.testRuntimeClasspath
+        into dependenciesDistDir
+}
