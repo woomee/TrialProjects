@@ -45,7 +45,7 @@ public class Chunk4 {
         };
     }
 
-    @Bean
+    @Bean("personWriter4")
     public JdbcBatchItemWriter<Person> personWriter4(DataSource dataSource) {
         return new JdbcBatchItemWriterBuilder<Person>()
             .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<Person>())

@@ -1,13 +1,15 @@
 package com.example.demo.jobs;
 
+import java.sql.PreparedStatement;
+import java.util.List;
+
 import javax.sql.DataSource;
 
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
-import org.springframework.batch.item.database.JdbcBatchItemWriter;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
-import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.lang.NonNull;
@@ -16,10 +18,10 @@ import org.springframework.stereotype.Component;
 import com.example.demo.entity.Person;
 
 @Component
-public class Chunk5 {
+public class Chunk6 {
 
     @Bean
-    public JdbcCursorItemReader<Person> personCursorItemReader5() {
+    public JdbcCursorItemReader<Person> personCursorItemReader6() {
 
         // 読み込み元のDataSoruceを取得
         DataSource srcSource = DataSourceBuilder.create()
@@ -40,7 +42,7 @@ public class Chunk5 {
     
         var reader = 
             new JdbcCursorItemReaderBuilder<Person>()
-            .name("personReader5")
+            .name("personReader6")
             .dataSource(srcSource)
             .beanRowMapper(Person.class)
             .sql(sql)
@@ -50,7 +52,7 @@ public class Chunk5 {
     }
 
     @Bean
-    public ItemProcessor<Person, Person> personProcessor5() {
+    public ItemProcessor<Person, Person> personProcessor6() {
         return new ItemProcessor<Person,Person>() {
             @Override
             public Person process(final @NonNull Person person) throws Exception {
@@ -63,13 +65,41 @@ public class Chunk5 {
         };
     }
 
-    @Bean("personWriter5")
-    public JdbcBatchItemWriter<Person> personWriter5(DataSource dataSource) {
-        System.out.println("personWriter5");
-        return new JdbcBatchItemWriterBuilder<Person>()
-            .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<Person>())
-            .sql("INSERT INTO people_dist (first_name, last_name) VALUES (:firstName, :lastName)")
-            .dataSource(dataSource)
-            .build();
+    @Bean("personWriter6")
+    public ItemWriter<Person> personWriter6() {
+        // return new JdbcBatchItemWriterBuilder<Person>()
+        //     .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<Person>())
+        //     .sql("INSERT INTO people_dist (first_name, last_name) VALUES (:firstName, :lastName)")
+        //     .dataSource(dataSource)
+        //     .build();
+        System.out.println("personWriter6");
+        return new PersonItemJdbcWriter();
+    }
+    @Component
+    private class PersonItemJdbcWriter implements ItemWriter<Person> {
+
+        @Autowired
+        private DataSource dataSource;
+
+        private static final String SQL = "INSERT INTO people_dist (first_name, last_name) VALUES (?, ?)";
+
+        @Override
+        public void write(List<? extends Person> items) throws Exception {
+            PreparedStatement preparedStatement = dataSource.getConnection().prepareStatement(SQL);
+            for(Person p : items) {
+                System.out.println("Person=" + p);
+                preparedStatement.setString(1, p.getFirstName());
+                preparedStatement.setString(2, p.getLastName());
+                preparedStatement.addBatch();
+            }
+            int count[] = preparedStatement.executeBatch();
+            System.out.print("count=");
+            for (int i : count) {
+                System.out.print(i + ",");
+            }
+            System.out.println("");
+            
+            
+        }
     }
 }

@@ -1,14 +1,12 @@
 package com.example.demo.jobs;
 
-import javax.sql.DataSource;
-
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
-import org.springframework.batch.item.database.JdbcBatchItemWriter;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -18,8 +16,9 @@ import com.example.demo.entity.Person;
 
 @Configuration
 @EnableBatchProcessing
-public class Job4_Chunk {
-    public static final String JOB_NAME=Job4_Chunk.class.getSimpleName();
+public class Job6_CopyTableBatch {
+    public static final String JOB_NAME=Job6_CopyTableBatch.class.getSimpleName();
+    public static final String STEP_NAME=JOB_NAME.replace("Job", "Step");
 
     @Autowired
     private JobBuilderFactory jobBuilderFactory;
@@ -28,34 +27,37 @@ public class Job4_Chunk {
     private StepBuilderFactory stepBuilderFactory;
 
     @Autowired
-    private Chunk4 chunk4;
+    private Chunk6 chunk6;
 
-    @Autowired 
-    DataSource dataSource;
-
-    @Autowired
-    @Qualifier("personWriter4")
-    JdbcBatchItemWriter<Person> personWriter4;
-    
     @Bean
-    public Job Job4_ChunkJob(JobCompletionNotificationListener listener, Step step4_1) {
+    public Job job6_ChunkJob(JobCompletionNotificationListener listener, Step step6) {
         return jobBuilderFactory.get(JOB_NAME)
             .incrementer(new RunIdIncrementer())
             .listener(listener)
-            .flow(step4_1)
+            .flow(step6)
             .end()
             .build();
     }
-
-    @Bean
-    // public Step step4_1(JdbcBatchItemWriter<Person> personWriter4) {
-    public Step step4_1() {
-            return stepBuilderFactory.get("step4_1")
-            .<Person, Person> chunk(2)
-            .reader(chunk4.personItemReader4())
-            .processor(chunk4.personProcessor4())
-            .writer(personWriter4)           // OK
-            // .writer(chunk4.personWriter4(dataSource))   // NG
+    
+    @Bean("step6")
+    @Qualifier("personWriter6")
+    public Step step6(ItemWriter<Person> personWriter6) {
+        return stepBuilderFactory.get(STEP_NAME)
+            .<Person, Person> chunk(3)
+            .reader(chunk6.personCursorItemReader6())
+            .processor(chunk6.personProcessor6())
+            .writer(personWriter6)
             .build();
     }
+    
+    // NG
+    // @Bean("step6")
+    // public Step step6() {
+    //     return stepBuilderFactory.get(STEP_NAME)
+    //         .<Person, Person> chunk(3)
+    //         .reader(chunk6.personCursorItemReader6())
+    //         .processor(chunk6.personProcessor6())
+    //         .writer(chunk6.personWriter6())
+    //         .build();
+    // }
 }
