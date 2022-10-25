@@ -65,7 +65,8 @@ public class Chunk6 {
         };
     }
 
-    @Bean("personWriter6")
+    // @Bean("personWriter6")
+    @Bean
     public ItemWriter<Person> personWriter6() {
         // return new JdbcBatchItemWriterBuilder<Person>()
         //     .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<Person>())
@@ -93,13 +94,12 @@ public class Chunk6 {
                 preparedStatement.addBatch();
             }
             int count[] = preparedStatement.executeBatch();
+            preparedStatement.close();
             System.out.print("count=");
             for (int i : count) {
                 System.out.print(i + ",");
             }
             System.out.println("");
-            
-            
         }
     }
 }

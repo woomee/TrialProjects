@@ -21,6 +21,7 @@ public class Chunk4 {
 
     @Bean
     public FlatFileItemReader<Person> personItemReader4() {
+        System.out.println("personItemReader4");
         return new FlatFileItemReaderBuilder<Person>()
             .name("personItemReader4")
             .resource(new ClassPathResource("sample-data.csv"))
@@ -34,6 +35,7 @@ public class Chunk4 {
 
     @Bean
     public ItemProcessor<Person, Person> personProcessor4() {
+        System.out.println("personProcessor4");
         return new ItemProcessor<Person,Person>() {
             @Override
             public Person process(final @NonNull Person person) throws Exception {
@@ -47,6 +49,7 @@ public class Chunk4 {
 
     @Bean("personWriter4")
     public JdbcBatchItemWriter<Person> personWriter4(DataSource dataSource) {
+        System.out.println("personWriter4");
         return new JdbcBatchItemWriterBuilder<Person>()
             .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<Person>())
             .sql("INSERT INTO people (first_name, last_name) VALUES (:firstName, :lastName)")
