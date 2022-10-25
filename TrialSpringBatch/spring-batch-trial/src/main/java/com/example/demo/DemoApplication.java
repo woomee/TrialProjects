@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Bean;
 public class DemoApplication {
 
 	// @Value("${spring.batch.job.names}")
-	// private String jobNames;
+	// private static String jobNames;
 
 	static ConfigurableApplicationContext ctx;
 
@@ -26,6 +26,7 @@ public class DemoApplication {
 	{
 		ctx = SpringApplication.run(DemoApplication.class, args);
 
+		// OK.ただ、jobNameは固定値
 		// Jobの順番を制御
 		// JobLauncher jobLauncher = (JobLauncher) ctx.getBean("jobLauncher");
 		// Job job2= (Job) ctx.getBean("sampleJob2");
@@ -33,6 +34,7 @@ public class DemoApplication {
 		// jobLauncher.run(job2, new JobParameters());
 		// jobLauncher.run(job1, new JobParameters());
 
+		// NG jobNamesがnull値
 		// String jobs[] = jobNames.split(",");
 		// for (String job : jobs) {
 		// 	Job jobObj = (Job) ctx.getBean(job);
